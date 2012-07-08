@@ -1,5 +1,11 @@
 object Hello {
-  val json = """{"name":"Rabbit","genes":[{"name":"FeedFrequency","value":1},{"name":"ReproduceFrequency","value":2,"minParents":2}]}"""
-  val result = Genome.deserialize(json)
-  def main(args: Array[String]) = println(result)
+  val json = """{"name":"Rabbit","genes":[{"name":"FeedFrequency","value":1.0},{"name":"ReproduceFrequency","value":2.0,"minParents":2.0}]}"""
+
+  def main(args: Array[String]) = {
+    val genome = Genome.deserialize(json)
+    println(genome)
+
+    val gene = FeedFrequency(2)
+    println(genome.genes(0).mix(gene))
+  }
 }
