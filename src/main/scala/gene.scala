@@ -23,3 +23,7 @@ case class FeedAmount(override val value: Double) extends Gene(value) {
 case class ReproduceFrequency(override val value: Double) extends Gene(value) {
   def build(value: Double): Gene = ReproduceFrequency(value)
 }
+
+case class Speed(override val value: Double) extends Gene(value) {
+  def build(value: Double): Gene = Speed(value)
+}
