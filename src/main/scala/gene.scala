@@ -1,14 +1,25 @@
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonTypeInfo(use=JsonTypeInfo.Id.MINIMAL_CLASS, property="name")
-abstract class Gene(val value: Float) {
-  def mix(other: Gene): Gene
+abstract class Gene(val value: Double) {
+  def build(value: Double): Gene
 }
 
-case class FeedFrequency(override val value: Float) extends Gene(value) {
-  def mix(other: Gene): Gene = FeedFrequency((this.value + other.value) / 2)
+object Gene {
+  def mix(genes: Seq[Gene]): Gene = {
+    val value: Double = (0.0 /: genes) { _ + _.value } / genes.size
+    genes.head.build(value)
+  }
 }
 
-case class ReproduceFrequency(override val value: Float, minParents: Float) extends Gene(value) {
-  def mix(other: Gene): Gene = ReproduceFrequency((this.value + other.value) / 2, 1)
+case class FeedFrequency(override val value: Double) extends Gene(value) {
+  def build(value: Double): Gene = FeedFrequency(value)
+}
+
+case class FeedAmount(override val value: Double) extends Gene(value) {
+  def build(value: Double): Gene = FeedAmount(value)
+}
+
+case class ReproduceFrequency(override val value: Double) extends Gene(value) {
+  def build(value: Double): Gene = ReproduceFrequency(value)
 }

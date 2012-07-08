@@ -1,11 +1,30 @@
 object Hello {
-  val json = """{"name":"Rabbit","genes":[{"name":"FeedFrequency","value":1.0},{"name":"ReproduceFrequency","value":2.0,"minParents":2.0}]}"""
+  val rabbitJson = """
+    {
+      "name": "Rabbit",
+      "genes": [
+        {"name": "FeedFrequency",      "value": 1.0},
+        {"name": "FeedAmount",         "value": 1.0},
+        {"name": "ReproduceFrequency", "value": 2.0}
+      ]
+    }
+  """
+
+  val pigJson = """
+    {
+      "name": "Pig",
+      "genes": [
+        {"name": "FeedFrequency",      "value": 3.0},
+        {"name": "ReproduceFrequency", "value": 4.0}
+      ]
+    }
+  """
 
   def main(args: Array[String]) = {
-    val genome = Genome.deserialize(json)
-    println(genome)
-
-    val gene = FeedFrequency(2)
-    println(genome.genes(0).mix(gene))
+    val rabbit = Genome.deserialize(rabbitJson)
+    val pig = Genome.deserialize(pigJson)
+    println(rabbit)
+    println(pig)
+    println(rabbit * pig)
   }
 }
