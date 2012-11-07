@@ -1,29 +1,30 @@
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonTypeInfo(use=JsonTypeInfo.Id.MINIMAL_CLASS, property="name")
-abstract class Gene(val value: Double) {
-  def build(value: Double): Gene
+abstract class Gene(val value: BigDecimal) {
+  def build(value: BigDecimal): Gene
 }
 
 object Gene {
   def mix(genes: Seq[Gene]): Gene = {
-    val value: Double = (0.0 /: genes) { _ + _.value } / genes.size
+    val value: BigDecimal = (BigDecimal(0) /: genes) { _ + _.value } / genes.size
+    /* genes.head.getClass.getConstructor(classOf[BigDecimal]).newInstance(value) */
     genes.head.build(value)
   }
 }
 
-case class FeedFrequency(override val value: Double) extends Gene(value) {
-  def build(value: Double): Gene = FeedFrequency(value)
+case class FeedFrequency(override val value: BigDecimal) extends Gene(value) {
+  def build(value: BigDecimal): Gene = FeedFrequency(value)
 }
 
-case class FeedAmount(override val value: Double) extends Gene(value) {
-  def build(value: Double): Gene = FeedAmount(value)
+case class FeedAmount(override val value: BigDecimal) extends Gene(value) {
+  def build(value: BigDecimal): Gene = FeedAmount(value)
 }
 
-case class ReproduceFrequency(override val value: Double) extends Gene(value) {
-  def build(value: Double): Gene = ReproduceFrequency(value)
+case class ReproduceFrequency(override val value: BigDecimal) extends Gene(value) {
+  def build(value: BigDecimal): Gene = ReproduceFrequency(value)
 }
 
-case class Speed(override val value: Double) extends Gene(value) {
-  def build(value: Double): Gene = Speed(value)
+case class Speed(override val value: BigDecimal) extends Gene(value) {
+  def build(value: BigDecimal): Gene = Speed(value)
 }
