@@ -1,4 +1,4 @@
-object Hello {
+object Main {
   val rabbitJson = """
     {
       "name": "Rabbit",
