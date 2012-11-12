@@ -1,1 +1,1 @@
-case class Organism(genome: Genome, health: Double)
+case class Organism(genome: Genome, health: BigDecimal)

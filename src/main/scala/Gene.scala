@@ -1,7 +1,7 @@
 abstract class Gene(val value: BigDecimal)
 
-case class FeedFrequency(override val value: BigDecimal) extends Gene(value)
 case class FeedAmount(override val value: BigDecimal) extends Gene(value)
+case class FeedFrequency(override val value: BigDecimal) extends Gene(value)
 case class ReproduceFrequency(override val value: BigDecimal) extends Gene(value)
 case class Speed(override val value: BigDecimal) extends Gene(value)
 
@@ -16,7 +16,7 @@ object Gene {
 
   def mix(genes: Seq[Gene]): Gene = {
     val value: BigDecimal = (BigDecimal(0) /: genes) { _ + _.value } / genes.size
-    genes.head.getClass.getConstructor(classOf[BigDecimal]).newInstance(value)
-    /* genes.head.build(value) */
+    /* genes.head.getClass.getConstructor(classOf[BigDecimal]).newInstance(value) */
+    Gene.build(genes.head.getClass.getName, value)
   }
 }

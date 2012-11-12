@@ -1,19 +1,20 @@
 import spray.json._
 import MyJsonProtocol._
 
-case class Genome(name: String, genes: Seq[Gene]) {
+// A genome is a set of genes.
+case class Genome(name: String, genes: Set[Gene]) {
+  def serialize: String = {
+    val ast = this.toJson
+    ast.compactPrint
+  }
+
   // Crosses this genome with the given genome to produce a new genome.
   def *(other: Genome): Genome = {
     val genes = (this.genes ++ other.genes)
       .groupBy(_.getClass)
-      .map { case (_, genes) => Gene.mix(genes) }
-      .toSeq
+      .map { case (_, genes) => Gene.mix(genes.toSeq) }
+      .toSet
     Genome(name, genes)
-  }
-
-  def serialize: String = {
-    val ast = this.toJson
-    ast.compactPrint
   }
 }
 
