@@ -27,7 +27,10 @@ object Main {
     val hybrid = rabbit * pig
     println(rabbit, pig, hybrid)
 
-    val organism = Organism(hybrid, 100)
-    println(organism)
+    var world = World(List(Organism(rabbit, 100), Organism(pig, 100), Organism(hybrid, 100)), 0)
+    for (i <- 0 until 100) {
+      println(world)
+      world = world.tick
+    }
   }
 }

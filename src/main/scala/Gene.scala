@@ -1,3 +1,4 @@
+// A gene represents a parameter and a value.
 abstract class Gene(val value: BigDecimal)
 
 case class FeedAmount(override val value: BigDecimal) extends Gene(value)
