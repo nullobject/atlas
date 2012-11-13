@@ -4,5 +4,5 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "io.spray" %% "spray-json" % "1.2.2" cross CrossVersion.full,
-  "org.scalatest" %% "scalatest" % "2.0.M4" % "test"
+  "org.scalatest" %% "scalatest" % "2.0.M5" % "test"
 )
