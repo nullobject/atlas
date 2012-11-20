@@ -1,3 +1,5 @@
+import akka.actor.{ActorSystem, Props}
+
 object Main {
   val rabbitJson = """
     {
@@ -21,25 +23,20 @@ object Main {
     }
   """
 
+  val system = ActorSystem()
+
   def main(args: Array[String]) = {
     val rabbit = Genome.deserialize(rabbitJson)
     val pig    = Genome.deserialize(pigJson)
     val hybrid = rabbit * pig
     println(rabbit, pig, hybrid)
 
-    var world = World(
-      List(
-        Organism(Organism.Idle, Organism.Data(rabbit, 100)),
-        Organism(Organism.Idle, Organism.Data(pig,    100)),
-        Organism(Organism.Idle, Organism.Data(hybrid, 100))
-      ),
-      World.Idle,
-      World.Data(0)
-    )
+    var world = system.actorOf(Props[World])
+    println(world)
 
-    for (i <- 0 until 100) {
-      println(world)
-      world = world.tick
-    }
+    /* for (i <- 0 until 100) { */
+    /*   println(world) */
+    /*   world = world.tick */
+    /* } */
   }
 }
