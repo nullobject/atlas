@@ -1,4 +1,4 @@
-import akka.actor.{Actor, ActorRef, FSM}
+import akka.actor.ActorRef
 
 case class Cell(
   position: Tuple2[Int, Int],
@@ -7,69 +7,47 @@ case class Cell(
   organisms: Set[ActorRef] = Set.empty,
 
   // The food available in this cell.
-  food: Int = 0,
+  food: Int = 100,
 
   // The water available in this cell.
-  water: Int = 0
+  water: Int = 100
 )
 
-object World {
-  type Vector2 = Tuple2[Int, Int]
-  object N extends Vector2( 0, -1)
-  object S extends Vector2( 0,  1)
-  object E extends Vector2( 1,  0)
-  object W extends Vector2(-1,  0)
+case class World(cells: Set[Cell] = Set.empty, age: Int = 0) {
+  // Returns the cell at the given position.
+  def getCellAtPosition(position: Game.Vector2) =
+    cells.find { _.position == position }
 
-  sealed trait State
-  case object Idle extends State
+  // Returns the cell containing the given organism.
+  def getCellForOrgansim(organism: ActorRef) =
+    cells.find { _.organisms.contains(organism) }
 
-  case class Data(cells: Set[Cell] = Set.empty, age: Int = 0) {
-    val sqrtCellsLength = scala.math.sqrt(cells.size).toInt
-
-    // Returns the cell at the given position.
-    def getCellAtPosition(position: Vector2) = Some(cells.toSeq((position._2 * sqrtCellsLength) + position._1))
-
-    // Returns the cell which contains the given organism.
-    def getCellForOrgansim(organism: ActorRef) = cells.find { _.organisms.contains(organism) }
-
-    // Returns the cell adjacent to the given cell in the given direction.
-    def getAdjacentCell(cell: Cell, direction: Vector2) = {
-      val position = (cell.position._1 + direction._1, cell.position._2 + direction._2)
-      getCellAtPosition(position)
-    }
+  // Returns the cell adjacent to the given cell in the given direction.
+  def getAdjacentCell(cell: Cell, direction: Game.Vector2) = {
+    val position = (cell.position._1 + direction._1, cell.position._2 + direction._2)
+    getCellAtPosition(position)
   }
 
-  sealed trait Message
-
-  // Move the organism in the given direction.
-  case class Move(organism: ActorRef, direction: Vector2) extends Message
-
-  // Consume a unit of food in the current cell.
-  case class Eat(organism: ActorRef) extends Message
-
-  // Consume a unit of water in the current cell.
-  case class Drink(organism: ActorRef) extends Message
-
-  def moveOrganism(data: Data, organism: ActorRef, direction: Vector2) = {
-    val source = data.getCellForOrgansim(organism).get
-    val destination = data.getAdjacentCell(source, direction).get
-    val newSource = source.copy(organisms = source.organisms - organism)
-    val newDestination = destination.copy(organisms = destination.organisms + organism)
-    data.copy(cells = data.cells - source - destination + newSource + newDestination)
+  // Moves the given organism in the given direction.
+  def move(organism: ActorRef, direction: Game.Vector2) = {
+    val from = getCellForOrgansim(organism).get
+    val to = getAdjacentCell(from, direction).get
+    val newFrom = from.copy(organisms = from.organisms - organism)
+    val newTo = to.copy(organisms = to.organisms + organism)
+    copy(cells = cells - from + newFrom - to + newTo)
   }
-}
 
-/*
- * A world represents a set of cells.
- */
-class World extends Actor with FSM[World.State, World.Data] {
-  import World._
-
-  startWith(Idle, Data())
-  when(Idle) {
-    case Event(Move(organism, direction), data) => {
-      stay using moveOrganism(data, organism, direction)
-    }
+  // Decrements the food in the cell containing the given organism.
+  def eat(organism: ActorRef) = {
+    val from = getCellForOrgansim(organism).get
+    val newFrom = from.copy(food = from.food - 1)
+    copy(cells = cells - from + newFrom)
   }
-  initialize
+
+  // Decrements the water in the cell containing the given organism.
+  def drink(organism: ActorRef) = {
+    val from = getCellForOrgansim(organism).get
+    val newFrom = from.copy(water = from.water - 1)
+    copy(cells = cells - from + newFrom)
+  }
 }

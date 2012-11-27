@@ -31,7 +31,7 @@ object Main {
     val hybrid = rabbit * pig
     println(rabbit, pig, hybrid)
 
-    var world = system.actorOf(Props[World])
+    var world = system.actorOf(Props[Game])
     println(world)
 
     /* for (i <- 0 until 100) { */
