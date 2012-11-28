@@ -3,6 +3,7 @@ package atlas
 import akka.actor.{Actor, ActorSystem}
 import akka.testkit.{TestActorRef, TestKit}
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
+import VectorImplicits._
 
 object WorldTest {
   class EchoActor extends Actor {

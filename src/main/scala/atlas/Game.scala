@@ -1,6 +1,7 @@
 package atlas
 
 import akka.actor.{Actor, ActorRef, FSM}
+import VectorImplicits._
 
 object Game {
   sealed trait State
@@ -17,7 +18,6 @@ object Game {
   // Consume a unit of water in the current cell.
   case class Drink(organism: ActorRef) extends Message
 
-  type Vector2 = Tuple2[Int, Int]
   object N  extends Vector2( 0, -1)
   object NE extends Vector2( 1, -1)
   object E  extends Vector2( 1,  0)

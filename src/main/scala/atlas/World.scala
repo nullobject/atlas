@@ -1,6 +1,7 @@
 package atlas
 
 import akka.actor.ActorRef
+import VectorImplicits._
 
 case class Cell(
   position: Tuple2[Int, Int],
@@ -17,7 +18,7 @@ case class Cell(
 
 case class World(cells: Set[Cell] = Set.empty, age: Int = 0) {
   // Returns the cell at the given position.
-  def getCellAtPosition(position: Game.Vector2) =
+  def getCellAtPosition(position: Vector2) =
     cells.find { _.position == position }
 
   // Returns the cell containing the given player.
@@ -25,13 +26,11 @@ case class World(cells: Set[Cell] = Set.empty, age: Int = 0) {
     cells.find { _.players.contains(player) }
 
   // Returns the cell adjacent to the given cell in the given direction.
-  def getAdjacentCell(cell: Cell, direction: Game.Vector2) = {
-    val position = (cell.position._1 + direction._1, cell.position._2 + direction._2)
-    getCellAtPosition(position)
-  }
+  def getAdjacentCell(cell: Cell, direction: Vector2) =
+    getCellAtPosition(cell.position + direction)
 
   // Moves the given player in the given direction.
-  def move(player: ActorRef, direction: Game.Vector2) = {
+  def move(player: ActorRef, direction: Vector2) = {
     val from = getCellForPlayer(player).get
     val to = getAdjacentCell(from, direction).get
     val newFrom = from.copy(players = from.players - player)
