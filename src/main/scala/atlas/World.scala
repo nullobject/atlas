@@ -1,3 +1,5 @@
+package atlas
+
 import akka.actor.ActorRef
 
 case class Cell(

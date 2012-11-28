@@ -1,3 +1,5 @@
+package atlas
+
 // A gene represents a parameter and a value.
 abstract class Gene(val value: BigDecimal)
 
@@ -18,6 +20,6 @@ object Gene {
   def mix(genes: Seq[Gene]): Gene = {
     val value: BigDecimal = (BigDecimal(0) /: genes) { _ + _.value } / genes.size
     /* genes.head.getClass.getConstructor(classOf[BigDecimal]).newInstance(value) */
-    Gene.build(genes.head.getClass.getName, value)
+    Gene.build(genes.head.getClass.getSimpleName, value)
   }
 }

@@ -1,3 +1,5 @@
+package atlas
+
 import akka.actor.{Actor, ActorRef, FSM}
 
 object Player {

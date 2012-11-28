@@ -1,3 +1,5 @@
+package atlas
+
 import spray.json._
 import MyJsonProtocol._
 

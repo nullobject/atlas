@@ -1,3 +1,5 @@
+package atlas
+
 import org.scalatest.FunSpec
 
 class GenomeTest extends FunSpec {

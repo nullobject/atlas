@@ -1,3 +1,5 @@
+package atlas
+
 import akka.actor.{Actor, ActorSystem}
 import akka.testkit.{TestActorRef, TestKit}
 import org.scalatest.{BeforeAndAfterAll, FunSpec}

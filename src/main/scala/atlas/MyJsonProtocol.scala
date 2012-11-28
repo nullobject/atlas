@@ -1,9 +1,11 @@
+package atlas
+
 import spray.json._
 
 object MyJsonProtocol extends DefaultJsonProtocol {
   implicit object GeneFormat extends JsonFormat[Gene] {
     def write(x: Gene) = JsObject(
-      "name"  -> JsString(x.getClass.getName),
+      "name"  -> JsString(x.getClass.getSimpleName),
       "value" -> JsNumber(x.value)
     )
 
