@@ -1,26 +1,12 @@
 package atlas
 
-import akka.actor.{Actor, ActorSystem}
-import akka.testkit.{TestActorRef, TestKit}
-import org.scalatest.{BeforeAndAfterAll, FunSpec}
+import org.scalatest.FunSpec
 
-object WorldTest {
-  class EchoActor extends Actor {
-    def receive = {
-      case x => sender ! x
-    }
-  }
-}
-
-class WorldTest extends TestKit(ActorSystem()) with FunSpec with BeforeAndAfterAll {
-  import WorldTest._
-
-  override def afterAll { system.shutdown() }
-
-  val player1 = TestActorRef[EchoActor]
-  val player2 = TestActorRef[EchoActor]
-  val player3 = TestActorRef[EchoActor]
-  val player4 = TestActorRef[EchoActor]
+class WorldTest extends FunSpec {
+  val player1 = Player()
+  val player2 = Player()
+  val player3 = Player()
+  val player4 = Player()
 
   val cell1 = Cell(position = (0, 0), players = Set(player1))
   val cell2 = Cell(position = (1, 0), players = Set(player2, player3))

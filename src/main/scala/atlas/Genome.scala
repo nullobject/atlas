@@ -5,24 +5,19 @@ import MyJsonProtocol._
 
 // A genome is a set of genes.
 case class Genome(name: String, genes: Set[Gene]) {
-  def serialize: String = {
-    val ast = this.toJson
-    ast.compactPrint
-  }
+  def serialize = this.toJson.compactPrint
 
   // Crosses this genome with the given genome to produce a new genome.
-  def *(other: Genome): Genome = {
-    val genes = (this.genes ++ other.genes)
+  def *(that: Genome) = {
+    val newGenes = (this.genes ++ that.genes)
       .groupBy(_.getClass)
       .map { case (_, genes) => Gene.mix(genes.toSeq) }
       .toSet
-    Genome(name, genes)
+    copy(genes = newGenes)
   }
 }
 
 object Genome {
-  def deserialize(value: String): Genome = {
-    val ast = value.asJson
-    ast.convertTo[Genome]
-  }
+  def deserialize(value: String) = value.asJson.convertTo[Genome]
+  def empty = Genome(name = "", genes = Set.empty)
 }

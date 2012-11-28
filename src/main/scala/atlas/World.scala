@@ -1,9 +1,8 @@
 package atlas
 
-import akka.actor.ActorRef
-
 case class Cell(
-  position: Vector2 = (0, 0),
+  // The cell position.
+  position: Vector2,
 
   // The food available in this cell.
   food: Int = 100,
@@ -12,16 +11,16 @@ case class Cell(
   water: Int = 100,
 
   // The set of players currently occupying this cell.
-  players: Set[ActorRef] = Set.empty
+  players: Set[Player] = Set.empty
 )
 
-case class World(cells: Set[Cell] = Set.empty, age: Int = 0) {
+case class World(cells: Set[Cell], age: Int = 0) {
   // Returns the cell at the given position.
   def getCellAtPosition(position: Vector2) =
     cells.find { _.position == position }
 
   // Returns the cell containing the given player.
-  def getCellForPlayer(player: ActorRef) =
+  def getCellForPlayer(player: Player) =
     cells.find { _.players.contains(player) }
 
   // Returns the cell adjacent to the given cell in the given direction.
@@ -29,7 +28,7 @@ case class World(cells: Set[Cell] = Set.empty, age: Int = 0) {
     getCellAtPosition(cell.position + direction)
 
   // Moves the given player in the given direction.
-  def move(player: ActorRef, direction: Vector2) = {
+  def move(player: Player, direction: Vector2) = {
     val from = getCellForPlayer(player).get
     val to = getAdjacentCell(from, direction).get
     val newFrom = from.copy(players = from.players - player)
@@ -38,14 +37,14 @@ case class World(cells: Set[Cell] = Set.empty, age: Int = 0) {
   }
 
   // Decrements the food in the cell containing the given player.
-  def eat(player: ActorRef) = {
+  def eat(player: Player) = {
     val from = getCellForPlayer(player).get
     val newFrom = from.copy(food = from.food - 1)
     copy(cells = cells - from + newFrom)
   }
 
   // Decrements the water in the cell containing the given player.
-  def drink(player: ActorRef) = {
+  def drink(player: Player) = {
     val from = getCellForPlayer(player).get
     val newFrom = from.copy(water = from.water - 1)
     copy(cells = cells - from + newFrom)
