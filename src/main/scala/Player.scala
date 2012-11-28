@@ -1,6 +1,6 @@
 import akka.actor.{Actor, ActorRef, FSM}
 
-object Organism {
+object Player {
   sealed trait State
   case object Idle    extends State
   case object Feeding extends State
@@ -9,9 +9,6 @@ object Organism {
   case class Data(genome: Genome, health: Int)
 }
 
-/*
- * An organism represents a genome expressed in a living entity.
- */
-class Organism extends Actor with FSM[Organism.State, Organism.Data] {
-  import Organism._
+class Player extends Actor with FSM[Player.State, Player.Data] {
+  import Player._
 }
