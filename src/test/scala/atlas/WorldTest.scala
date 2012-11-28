@@ -51,21 +51,21 @@ class WorldTest extends TestKit(ActorSystem()) with FunSpec with BeforeAndAfterA
 
   describe("#getAdjacentCell") {
     it("should return the cell adjacent to the given cell in the given direction") {
-      assert(world.getAdjacentCell(cell1, Game.N)  === None)
-      assert(world.getAdjacentCell(cell1, Game.NE) === None)
-      assert(world.getAdjacentCell(cell1, Game.E)  === Some(cell2))
-      assert(world.getAdjacentCell(cell1, Game.SE) === Some(cell4))
-      assert(world.getAdjacentCell(cell1, Game.S)  === Some(cell3))
-      assert(world.getAdjacentCell(cell1, Game.SW) === None)
-      assert(world.getAdjacentCell(cell1, Game.W)  === None)
-      assert(world.getAdjacentCell(cell1, Game.NW) === None)
+      assert(world.getAdjacentCell(cell1, Direction.N)  === None)
+      assert(world.getAdjacentCell(cell1, Direction.NE) === None)
+      assert(world.getAdjacentCell(cell1, Direction.E)  === Some(cell2))
+      assert(world.getAdjacentCell(cell1, Direction.SE) === Some(cell4))
+      assert(world.getAdjacentCell(cell1, Direction.S)  === Some(cell3))
+      assert(world.getAdjacentCell(cell1, Direction.SW) === None)
+      assert(world.getAdjacentCell(cell1, Direction.W)  === None)
+      assert(world.getAdjacentCell(cell1, Direction.NW) === None)
     }
   }
 
   describe("#move") {
     it("should move the given player in the given direction") {
       assert(world.getCellForPlayer(player1).get.position === (0, 0))
-      val newWorld = world.move(player1, Game.S)
+      val newWorld = world.move(player1, Direction.S)
       assert(newWorld.getCellForPlayer(player1).get.position === (0, 1))
     }
   }

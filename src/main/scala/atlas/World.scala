@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import VectorImplicits._
 
 case class Cell(
-  position: Tuple2[Int, Int],
+  position: Vector2 = (0, 0),
 
   // The food available in this cell.
   food: Int = 100,

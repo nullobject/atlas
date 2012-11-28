@@ -17,15 +17,6 @@ object Game {
 
   // Consume a unit of water in the current cell.
   case class Drink(organism: ActorRef) extends Message
-
-  object N  extends Vector2( 0, -1)
-  object NE extends Vector2( 1, -1)
-  object E  extends Vector2( 1,  0)
-  object SE extends Vector2( 1,  1)
-  object S  extends Vector2( 0,  1)
-  object SW extends Vector2(-1,  1)
-  object W  extends Vector2(-1,  0)
-  object NW extends Vector2(-1, -1)
 }
 
 // The game finite state machine.

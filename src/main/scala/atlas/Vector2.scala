@@ -13,3 +13,14 @@ object Vector2 {
 object VectorImplicits {
   implicit def tuple2ToVector2(t: (Int, Int)) = new Vector2(t._1, t._2)
 }
+
+object Direction {
+  object N  extends Vector2( 0, -1)
+  object NE extends Vector2( 1, -1)
+  object E  extends Vector2( 1,  0)
+  object SE extends Vector2( 1,  1)
+  object S  extends Vector2( 0,  1)
+  object SW extends Vector2(-1,  1)
+  object W  extends Vector2(-1,  0)
+  object NW extends Vector2(-1, -1)
+}
