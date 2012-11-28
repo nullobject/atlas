@@ -8,9 +8,8 @@ class Vector2(_1: Int, _2: Int) extends Tuple2[Int, Int](_1, _2) {
 
 object Vector2 {
   def apply(x: Int, y: Int) = new Vector2(x, y)
-}
 
-object VectorImplicits {
+  // Automatic conversion from a Tuple2 to a Vector2.
   implicit def tuple2ToVector2(t: (Int, Int)) = new Vector2(t._1, t._2)
 }
 

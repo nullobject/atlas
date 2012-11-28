@@ -1,7 +1,6 @@
 package atlas
 
 import akka.actor.{Actor, ActorRef, FSM}
-import VectorImplicits._
 
 object Game {
   sealed trait State

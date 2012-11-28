@@ -1,7 +1,6 @@
 package atlas
 
 import akka.actor.ActorRef
-import VectorImplicits._
 
 case class Cell(
   position: Vector2 = (0, 0),
