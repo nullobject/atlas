@@ -10,7 +10,7 @@ object MyJsonProtocol extends DefaultJsonProtocol {
     )
 
     def read(value: JsValue) = value.asJsObject.getFields("name", "value") match {
-      case Seq(JsString(name), JsNumber(value)) => Gene.build(name, value)
+      case Seq(JsString(name), JsNumber(value)) => Gene.build(name, value.doubleValue)
       case _ => throw new DeserializationException("Gene expected")
     }
   }

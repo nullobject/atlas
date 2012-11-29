@@ -23,7 +23,7 @@ class GenomeTest extends FunSpec {
   }
   describe("#serialize") {
     it("should convert the genome into a JSON string") {
-      assert(rabbit.serialize === """{"name":"Rabbit","genes":[{"name":"FeedAmount","value":1},{"name":"FeedFrequency","value":2},{"name":"ReproduceFrequency","value":3}]}""")
+      assert(rabbit.serialize === """{"name":"Rabbit","genes":[{"name":"FeedAmount","value":1.0},{"name":"FeedFrequency","value":2.0},{"name":"ReproduceFrequency","value":3.0}]}""")
     }
   }
   describe("#*") {
