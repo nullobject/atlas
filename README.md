@@ -6,6 +6,12 @@
 
 ## How the game works
 
+### Habitat
+
+A player prefers to live in a biome based on their genes. Occupying cells within a player's preferred biome consumes the least amount of energy.
+
+For example, a desert dweller prefers not to exist within a forest biome.
+
 ### Movement
 
 A player can move from their current cell to a neighbouring cell. Movement consumes food and water.
@@ -19,10 +25,15 @@ rate at which a player must eat or drink is dependent on a player's genes.
 
 ### Attacking
 
-### Reproduction
+### Mating
+
+An organsim can only mate with another organism if they are genetically compatible.
 
 ### Genes
 
+* PreferredTemperature: the preferred temperature for a player.
+* PreferredMoisture: the preferred moisure for a player.
+* PreferredElevation: the preferred elevation for a player.
 * EatFrequency: how often a player needs to eat.
 * DrinkFrequency: how often a player needs to drink.
 * ReproduceFrequency: how often a player can reproduce.
@@ -68,7 +79,7 @@ rate at which a player must eat or drink is dependent on a player's genes.
 
 # Action
 
-Move the bot in the given direction:
+Move:
 
     {
       "action": "move",
@@ -85,4 +96,18 @@ Drink:
 
     {
       "action": "drink"
+    }
+
+Attack:
+
+    {
+      "action": "attack",
+      "player_id": "123"
+    }
+
+Mate:
+
+    {
+      "action": "mate",
+      "player_id": "123"
     }
