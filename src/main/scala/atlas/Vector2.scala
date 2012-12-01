@@ -1,5 +1,7 @@
 package atlas
 
+import scala.language.implicitConversions
+
 class Vector2(_1: Int, _2: Int) extends Tuple2[Int, Int](_1, _2) {
   def x = _1
   def y = _2
