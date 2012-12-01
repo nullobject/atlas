@@ -12,7 +12,7 @@ case class Organism(
   // The organism health.
   health: Int = 100
 ) {
-   // Returns true if this organism is similar to the given organism.
+  // Returns true if this organism is similar to the given organism.
   def isSimilar(that: Organism) =
     (this.genome similarity that.genome) > 0.9
 }

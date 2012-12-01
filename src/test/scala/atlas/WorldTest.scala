@@ -15,6 +15,15 @@ class WorldTest extends FunSpec {
 
   val world = World(cells = Set(cell1, cell2, cell3, cell4))
 
+  describe("#getOrganismById") {
+    it("should return the organism with the given ID") {
+      assert(world.getOrganismById(organism1.id) === Some(organism1))
+      assert(world.getOrganismById(organism2.id) === Some(organism2))
+      assert(world.getOrganismById(organism3.id) === Some(organism3))
+      assert(world.getOrganismById(organism4.id) === None)
+    }
+  }
+
   describe("#getCellAtPosition") {
     it("should return the cell at the given position") {
       assert(world.getCellAtPosition(0, 0) === Some(cell1))

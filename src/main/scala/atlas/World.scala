@@ -1,5 +1,7 @@
 package atlas
 
+import java.util.UUID
+
 case class Cell(
   // The cell position.
   position: Vector2,
@@ -15,6 +17,10 @@ case class Cell(
 )
 
 case class World(cells: Set[Cell], age: Int = 0) {
+  // Returns the organism with the given ID.
+  def getOrganismById(id: UUID) =
+    cells.flatMap { _.organisms.find { _.id == id } }.headOption
+
   // Returns the cell at the given position.
   def getCellAtPosition(position: Vector2) =
     cells.find { _.position == position }
