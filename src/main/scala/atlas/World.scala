@@ -1,6 +1,8 @@
 package atlas
 
 import java.util.UUID
+import spray.json._
+import MyJsonProtocol._
 
 case class Cell(
   // The cell position.
@@ -12,7 +14,7 @@ case class Cell(
   // The water available in this cell.
   water: Int = 100,
 
-  // The set of organisms currently occupying this cell.
+  // The set of organisms occupying this cell.
   organisms: Set[Organism] = Set.empty
 )
 
@@ -55,4 +57,14 @@ case class World(cells: Set[Cell], age: Int = 0) {
     val newFrom = from.copy(water = from.water - 1)
     copy(cells = cells - from + newFrom)
   }
+}
+
+case class WorldView(
+  // The organisms controlled by the player.
+  organisms: Set[Organism],
+
+  // The cells visible to the player.
+  cells: Set[Cell]
+) {
+  def serialize = this.toJson.compactPrint
 }

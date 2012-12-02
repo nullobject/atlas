@@ -1,6 +1,7 @@
 package atlas
 
 import akka.actor.{Actor, FSM}
+import java.util.UUID
 
 object Game {
   sealed trait State
@@ -8,28 +9,40 @@ object Game {
 
   sealed trait Message
 
+  case object Tick extends Message
+
   // Move the organism in the given direction.
-  case class Move(organism: Organism, direction: Vector2) extends Message
+  case class Move(id: UUID, direction: Vector2) extends Message
 
   // Consume a unit of food in the current cell.
-  case class Eat(organism: Organism) extends Message
+  case class Eat(id: UUID) extends Message
 
   // Consume a unit of water in the current cell.
-  case class Drink(organism: Organism) extends Message
+  case class Drink(id: UUID) extends Message
 }
 
-// The game finite state machine.
+// The game FSM.
 class Game extends Actor with FSM[Game.State, World] {
   import Game._
 
   startWith(Idle, World(cells = Set.empty))
   when(Idle) {
-    case Event(Move(organism, direction), world) =>
+    case Event(Tick, world) => {
+      // TODO: Tick each player with their world state.
+      stay
+    }
+    case Event(Move(id, direction), world) => {
+      val organism = world.getOrganismById(id).get
       stay using world.move(organism, direction)
-    case Event(Eat(organism), world) =>
+    }
+    case Event(Eat(id), world) => {
+      val organism = world.getOrganismById(id).get
       stay using world.eat(organism)
-    case Event(Drink(organism), world) =>
+    }
+    case Event(Drink(id), world) => {
+      val organism = world.getOrganismById(id).get
       stay using world.drink(organism)
+    }
   }
   initialize
 }
