@@ -20,8 +20,9 @@ class Player extends Actor with FSM[Player.State, WorldView] {
   val socket = ZeroMQExtension(context.system).newSocket(SocketType.Req, Listener(self), Bind("tcp://127.0.0.1:1235"))
   val organism1 = Organism()
   val cell1 = Cell(position = (0, 0), organisms = Set(organism1))
+  val worldView = WorldView(organisms = Set(organism1), cells = Set(cell1))
 
-  startWith(Idle, WorldView(organisms = Set.empty, cells = Set(cell1)))
+  startWith(Idle, worldView)
   when(Idle) {
     case Event(Tick, worldView) =>
       socket ! ZMQMessage(Seq(Frame(worldView.serialize)))
@@ -29,7 +30,8 @@ class Player extends Actor with FSM[Player.State, WorldView] {
   }
   whenUnhandled {
     case Event(message: ZMQMessage, _) =>
-      log.info("Received: " + message.firstFrameAsString)
+      val intention = Intention.deserialize(message.firstFrameAsString)
+      log.info("Received: " + intention)
       stay
     case Event(message, _) ⇒
       log.warning("Received unknown event: " + message)
