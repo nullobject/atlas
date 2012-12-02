@@ -3,7 +3,7 @@ package atlas
 import java.util.UUID
 import spray.json._
 
-object MyJsonProtocol extends DefaultJsonProtocol {
+object JsonFormats extends DefaultJsonProtocol {
   implicit object UUIDFormat extends JsonFormat[UUID] {
     def write(id: UUID) = JsString(id.toString)
     def read(value: JsValue) = value match {

@@ -2,7 +2,7 @@ package atlas
 
 import java.util.UUID
 import spray.json._
-import MyJsonProtocol._
+import JsonFormats._
 
 case class Cell(
   // The cell position.

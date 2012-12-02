@@ -2,7 +2,7 @@ package atlas
 
 import spray.json._
 import FractionalImplicits._
-import MyJsonProtocol._
+import JsonFormats._
 
 // A genome is a set of genes.
 case class Genome(name: String, genes: Map[String, Double]) {
