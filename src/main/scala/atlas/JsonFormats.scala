@@ -4,7 +4,7 @@ import java.util.UUID
 import spray.json._
 
 object JsonFormats extends DefaultJsonProtocol {
-  implicit object UUIDFormat extends JsonFormat[UUID] {
+  implicit object UUIDFormat extends RootJsonFormat[UUID] {
     def write(id: UUID) = JsString(id.toString)
     def read(value: JsValue) = value match {
       case JsString(s) => UUID.fromString(s)
@@ -12,7 +12,7 @@ object JsonFormats extends DefaultJsonProtocol {
     }
   }
 
-  implicit object Vector2Format extends JsonFormat[Vector2] {
+  implicit object Vector2Format extends RootJsonFormat[Vector2] {
     def write(v: Vector2) = JsArray(JsNumber(v.x), JsNumber(v.y))
     def read(value: JsValue) = value match {
       case JsArray(JsNumber(x) :: JsNumber(y) :: Nil) => Vector2(x.toInt, y.toInt)
@@ -20,10 +20,10 @@ object JsonFormats extends DefaultJsonProtocol {
     }
   }
 
-  implicit object IntentionFormat extends JsonFormat[Intention] {
+  implicit object IntentionFormat extends RootJsonFormat[Intention] {
     def write(intention: Intention) = intention match {
       case Intention.Idle | Intention.Eat | Intention.Drink => JsObject("action" -> JsString(intention.getClass.getSimpleName))
-      case Intention.Move(d) => JsObject("action" -> JsString(intention.getClass.getSimpleName), "direction" -> d.toJson)
+      case Intention.Move(direction) => JsObject("action" -> JsString(intention.getClass.getSimpleName), "direction" -> direction.toJson)
       case _ => throw new DeserializationException("Unknown intention")
     }
 
