@@ -100,12 +100,12 @@ Attack:
 
     {
       "action": "attack",
-      "organism_id": "123"
+      "organismId": "123"
     }
 
 Mate:
 
     {
       "action": "mate",
-      "organism_id": "123"
+      "organismId": "123"
     }
