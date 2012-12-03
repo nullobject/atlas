@@ -1,43 +1,44 @@
 package atlas
 
-import akka.actor.{Actor, FSM, Props}
+import akka.actor.{Actor, ActorLogging}
 import akka.zeromq._
-import java.util.UUID
 
-object Player {
-  sealed trait State
-  case object Idle extends State
-  case object Error extends State
-
+object Router {
   sealed trait Message
   case object Tick extends Message
 }
 
-// The player FSM.
-class Player extends Actor with FSM[Player.State, WorldView] {
-  import Player._
+/**
+ * The router manages client connections. Clients may submit their requests
+ * intentions to the router for each game "tick". When the router processes the
+ * client intentions the responses (world views) are returned to the client.
+ */
+class Router extends Actor with ActorLogging {
+  import Router._
 
-  val socket = ZeroMQExtension(context.system).newSocket(SocketType.Dealer, Listener(self), Bind("tcp://127.0.0.1:1235"))
+  val socket = ZeroMQExtension(context.system).newSocket(SocketType.Router, Listener(self), Bind("tcp://127.0.0.1:1235"), HighWatermark(1000))
   val organism1 = Organism()
   val cell1 = Cell(position = (0, 0), organisms = Set(organism1))
-  val worldView = WorldView(organisms = Set(organism1), cells = Set(cell1))
+  var worldView = WorldView(organisms = Set(organism1), cells = Set(cell1))
+  var clients: Map[Seq[Byte], Intention] = Map.empty
 
-  startWith(Idle, worldView)
-  when(Idle) {
-    case Event(Tick, worldView) =>
-      socket ! ZMQMessage(Seq(Frame(Nil), Frame(worldView.serialize)))
-      stay
-  }
-  whenUnhandled {
-    case Event(message: ZMQMessage, _) =>
+  def receive: Receive = {
+    case Tick =>
+      // TODO: apply all intentions.
+      // TODO: send each waiting player their world view.
+      clients.map {
+        case (address, intention) =>
+          socket ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
+      }
+
+    case message: ZMQMessage =>
       log.debug("Received: " + message)
-      val s = new String(message.frames(1).payload.toArray, "UTF-8")
-      val intention = Intention.deserialize(s)
-      log.info("Intention: " + intention)
-      stay
-    case Event(message, _) ⇒
-      log.warning("Received unknown event: " + message)
-      goto(Error)
+
+      val address = message.frames(0).payload
+      val json = new String(message.frames(2).payload.toArray, "UTF-8")
+      val intention = Intention.deserialize(json)
+
+      // Store the address/intention mapping.
+      clients += (address -> intention)
   }
-  initialize
 }
