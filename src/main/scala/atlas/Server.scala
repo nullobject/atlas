@@ -33,18 +33,17 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
     // Applies each client intention and replies with their world view.
     case Tick =>
       game ! Game.Tick
-      clients.map {
-        case (address, intention) =>
-          log.debug("Intention: " + intention)
-          val future = ask(game, intention).mapTo[World]
-          future.map { result =>
-            log.info("Result: " + result)
-            router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
-          }
+      clients.map { case (address, intention) =>
+        log.debug(s"Intention: $intention")
+        val future = ask(game, intention).mapTo[World]
+        future.map { result =>
+          log.debug(s"Result: $result")
+          router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
+        }
       }
 
     case message: ZMQMessage =>
-      log.debug("Received: " + message)
+      log.debug(s"Received: $message")
 
       val address = message.frames(0).payload
       val json = new String(message.frames(2).payload.toArray, "UTF-8")
