@@ -40,6 +40,12 @@ An organsim can only mate with another organism if they are genetically compatib
 
 ## Client
 
+# Messages
+
+* The client requests the world view.
+* The server responds to the client with a world view.
+* The server processes the intention.
+
 # Tick
 
     {
