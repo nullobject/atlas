@@ -4,7 +4,6 @@ import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.zeromq._
-import java.util.UUID
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.language.postfixOps
@@ -27,7 +26,7 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
   val organism1 = Organism()
   val cell1 = Cell(position = (0, 0), organisms = Set(organism1))
   var worldView = WorldView(organisms = Set(organism1), cells = Set(cell1))
-  var clients: Map[Seq[Byte], Intention] = Map.empty
+  var clients: Map[Seq[Byte], Game.Intention] = Map.empty
   implicit val timeout = Timeout(5 seconds)
 
   def receive: Receive = {
@@ -36,7 +35,8 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
       game ! Game.Tick
       clients.map {
         case (address, intention) =>
-          val future = ask(game, Game.Move(UUID.fromString("0798acfd-0675-465b-966d-d77f044e443b"), Vector2(0, 0))).mapTo[World]
+          log.debug("Intention: " + intention)
+          val future = ask(game, intention).mapTo[World]
           future.map { result =>
             log.info("Result: " + result)
             router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
@@ -48,7 +48,7 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
 
       val address = message.frames(0).payload
       val json = new String(message.frames(2).payload.toArray, "UTF-8")
-      val intention = Intention.deserialize(json)
+      val intention = Game.Intention.deserialize(json)
 
       // Store the client address to intention mapping.
       clients += (address -> intention)

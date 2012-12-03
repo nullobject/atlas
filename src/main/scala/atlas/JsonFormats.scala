@@ -20,12 +20,20 @@ object JsonFormats extends DefaultJsonProtocol {
     }
   }
 
-  implicit object IntentionFormat extends RootJsonFormat[Intention] {
-    def write(intention: Intention) = intention match {
-      case Intention.Idle | Intention.Eat | Intention.Drink => JsObject(
+  implicit object IntentionFormat extends RootJsonFormat[Game.Intention] {
+    def write(intention: Game.Intention) = intention match {
+      case Game.Intention.Idle => JsObject(
         "action" -> JsString(intention.getClass.getSimpleName)
       )
-      case Intention.Move(organismId, direction) => JsObject(
+      case Game.Intention.Eat(organismId) => JsObject(
+        "action" -> JsString(intention.getClass.getSimpleName),
+        "organismId" -> organismId.toJson
+      )
+      case Game.Intention.Drink(organismId) => JsObject(
+        "action" -> JsString(intention.getClass.getSimpleName),
+        "organismId" -> organismId.toJson
+      )
+      case Game.Intention.Move(organismId, direction) => JsObject(
         "action" -> JsString(intention.getClass.getSimpleName),
         "organismId" -> organismId.toJson,
         "direction" -> direction.toJson
@@ -36,11 +44,14 @@ object JsonFormats extends DefaultJsonProtocol {
     def read(value: JsValue) = {
       val fields = value.asJsObject.fields
       fields.get("action").get match {
-        case JsString("Idle")  => Intention.Idle
-        case JsString("Eat")   => Intention.Eat
-        case JsString("Drink") => Intention.Drink
+        case JsString("Idle") =>
+          Game.Intention.Idle
+        case JsString("Eat") =>
+          Game.Intention.Eat(fields.get("organismId").get.convertTo[UUID])
+        case JsString("Drink") =>
+          Game.Intention.Drink(fields.get("organismId").get.convertTo[UUID])
         case JsString("Move")  =>
-          Intention.Move(fields.get("organismId").get.convertTo[UUID], fields.get("direction").get.convertTo[Vector2])
+          Game.Intention.Move(fields.get("organismId").get.convertTo[UUID], fields.get("direction").get.convertTo[Vector2])
         case _ => throw new DeserializationException("Intention expected")
       }
     }
