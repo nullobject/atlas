@@ -27,22 +27,20 @@ class Game extends Actor with FSM[Game.State, World] {
 
   startWith(Idle, World(cells = Set.empty))
   when(Idle) {
-    case Event(Tick, world) => {
+    case Event(Tick, world) =>
       stay using world.tick
-      stay
-    }
-    case Event(Move(id, direction), world) => {
-      val organism = world.getOrganismById(id).get
-      stay using world.move(organism, direction)
-    }
-    case Event(Eat(id), world) => {
+    case Event(Move(id, direction), world) =>
+      /* val organism = world.getOrganismById(id).get */
+      /* val newWorld = world.move(organism, direction) */
+      val newWorld = world
+      sender ! newWorld
+      stay using newWorld
+    case Event(Eat(id), world) =>
       val organism = world.getOrganismById(id).get
       stay using world.eat(organism)
-    }
-    case Event(Drink(id), world) => {
+    case Event(Drink(id), world) =>
       val organism = world.getOrganismById(id).get
       stay using world.drink(organism)
-    }
   }
   initialize
 }
