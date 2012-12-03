@@ -56,6 +56,14 @@ class WorldTest extends FunSpec {
     }
   }
 
+  describe("#tick") {
+    it("should increment the age") {
+      assert(world.age === 0)
+      val newWorld = world.tick
+      assert(newWorld.age === 1)
+    }
+  }
+
   describe("#move") {
     it("should move the given organism in the given direction") {
       assert(world.getCellForOrganism(organism1).get.position === (0, 0))

@@ -28,7 +28,7 @@ class Game extends Actor with FSM[Game.State, World] {
   startWith(Idle, World(cells = Set.empty))
   when(Idle) {
     case Event(Tick, world) => {
-      // TODO: Tick each player with their world state.
+      stay using world.tick
       stay
     }
     case Event(Move(id, direction), world) => {

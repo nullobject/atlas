@@ -35,6 +35,9 @@ case class World(cells: Set[Cell], age: Int = 0) {
   def getAdjacentCell(cell: Cell, direction: Vector2) =
     getCellAtPosition(cell.position + direction)
 
+  // Ticks the world state.
+  def tick() = copy(age = age + 1)
+
   // Moves the given organism in the given direction.
   def move(organism: Organism, direction: Vector2) = {
     val from = getCellForOrganism(organism).get
