@@ -23,9 +23,6 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
   import Server._
 
   val router = ZeroMQExtension(context.system).newSocket(SocketType.Router, Listener(self), Bind("tcp://127.0.0.1:1235"), HighWatermark(1000))
-  val organism1 = Organism()
-  val cell1 = Cell(position = (0, 0), organisms = Set(organism1))
-  var worldView = WorldView(organisms = Set(organism1), cells = Set(cell1))
   var clients: Map[Seq[Byte], Game.Intention] = Map.empty
   implicit val timeout = Timeout(5 seconds)
 
@@ -38,17 +35,9 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
   }
 
   def receive: Receive = {
-    // Applies each client intention and replies with their world view.
     case Tick =>
+      processClientIntentions
       game ! Game.Tick
-      clients.map { case (address, intention) =>
-        log.debug(s"Intention: $intention")
-        val future = ask(game, intention).mapTo[World]
-        future.map { result =>
-          log.debug(s"Result: $result")
-          router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
-        }
-      }
 
     case message: ZMQMessage =>
       log.debug(s"Received: $message")
@@ -59,5 +48,15 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
 
       // Store the client address to intention mapping.
       clients += (address -> intention)
+  }
+
+  def processClientIntentions = clients.map {
+    case (address, intention) =>
+      log.debug(s"Intention: $intention")
+      val future = ask(game, intention).mapTo[WorldView]
+      future.map { worldView =>
+        log.debug(s"Result: $worldView")
+        router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
+      }
   }
 }

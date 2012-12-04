@@ -1,8 +1,6 @@
 package atlas
 
 import java.util.UUID
-import spray.json._
-import JsonFormats._
 
 case class Cell(
   // The cell position.
@@ -19,6 +17,9 @@ case class Cell(
 )
 
 case class World(cells: Set[Cell], age: Int = 0) {
+  // Returns the organisms.
+  def organisms = cells.flatMap { _.organisms }
+
   // Returns the organism with the given ID.
   def getOrganismById(id: UUID) =
     cells.flatMap { _.organisms.find { _.id == id } }.headOption
@@ -60,14 +61,4 @@ case class World(cells: Set[Cell], age: Int = 0) {
     val newFrom = from.copy(water = from.water - 1)
     copy(cells = cells - from + newFrom)
   }
-}
-
-case class WorldView(
-  // The organisms controlled by the player.
-  organisms: Set[Organism],
-
-  // The cells visible to the player.
-  cells: Set[Cell]
-) {
-  def serialize = this.toJson.compactPrint
 }
