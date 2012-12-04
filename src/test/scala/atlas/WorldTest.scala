@@ -65,47 +65,47 @@ class WorldTest extends FunSpec {
   describe("#tick") {
     it("should increment the age") {
       assert(world.age === 0)
-      val newWorld = world.tick
-      assert(newWorld.age === 1)
+      val result = world.tick
+      assert(result.get.age === 1)
     }
   }
 
   describe("#move") {
     it("should move the given organism in the given direction") {
       assert(world.getCellForOrganism(organism1).get.position === (0, 0))
-      val newWorld = world.move(organism1, Direction.S)
-      assert(newWorld.getCellForOrganism(organism1).get.position === (0, 1))
+      val result = world.move(organism1, Direction.S).get
+      assert(result.getCellForOrganism(organism1).get.position === (0, 1))
     }
 
     it("should throw an error when moving to an unkown cell") {
       assert(world.getCellForOrganism(organism1).get.position === (0, 0))
-      intercept[World.InvalidOperationException] { world.move(organism1, Direction.N) }
+      intercept[World.InvalidOperationException] { world.move(organism1, Direction.N).get }
     }
   }
 
   describe("#eat") {
     it("should decrement the food in the cell containing the given organism") {
       assert(world.getCellForOrganism(organism1).get.food === 100)
-      val newWorld = world.eat(organism1)
-      assert(newWorld.getCellForOrganism(organism1).get.food === 99)
+      val result = world.eat(organism1).get
+      assert(result.getCellForOrganism(organism1).get.food === 99)
     }
 
     it("should throw an error when eating in a cell with no food") {
       assert(world.getCellForOrganism(organism2).get.food === 0)
-      intercept[World.InvalidOperationException] { world.eat(organism2) }
+      intercept[World.InvalidOperationException] { world.eat(organism2).get }
     }
   }
 
   describe("#drink") {
     it("should decrement the water in the cell containing the given organism") {
       assert(world.getCellForOrganism(organism1).get.water === 100)
-      val newWorld = world.drink(organism1)
-      assert(newWorld.getCellForOrganism(organism1).get.water === 99)
+      val result = world.drink(organism1).get
+      assert(result.getCellForOrganism(organism1).get.water === 99)
     }
 
     it("should throw an error when drinking in a cell with no water") {
       assert(world.getCellForOrganism(organism2).get.water === 0)
-      intercept[World.InvalidOperationException] { world.drink(organism2) }
+      intercept[World.InvalidOperationException] { world.drink(organism2).get }
     }
   }
 }

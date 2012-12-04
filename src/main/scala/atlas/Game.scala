@@ -2,6 +2,7 @@ package atlas
 
 import akka.actor.{Actor, FSM}
 import java.util.UUID
+import scala.util.{Try, Success, Failure}
 import spray.json._
 import JsonFormats._
 
@@ -31,7 +32,9 @@ object Game {
   }
 }
 
-// The game FSM.
+/**
+ * The game FSM.
+ */
 class Game(world: World) extends Actor with FSM[Game.State, World] {
   import Game._
 
@@ -39,44 +42,44 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
 
   when(Idle) {
     case Event(Tick, world) =>
-      stay using world.tick
+      stay using world.tick.get
 
     case Event(Intention.Idle, world) =>
       sender ! WorldView(world)
       stay
 
     case Event(Intention.Move(id, direction), world) =>
-      try {
-        val organism = world.getOrganismById(id).get
-        val newWorld = world.move(organism, direction)
-        sender ! WorldView(newWorld)
-        stay using newWorld
-      } catch {
-        case e: World.InvalidOperationException =>
+      val organism = world.getOrganismById(id).get
+      val result = world.move(organism, direction)
+      result match {
+        case Success(newWorld) =>
+          sender ! WorldView(newWorld)
+          stay using newWorld
+        case Failure(e) =>
           sender ! akka.actor.Status.Failure(e)
           stay
       }
 
     case Event(Intention.Eat(id), world) =>
-      try {
-        val organism = world.getOrganismById(id).get
-        val newWorld = world.eat(organism)
-        sender ! WorldView(newWorld)
-        stay using newWorld
-      } catch {
-        case e: World.InvalidOperationException =>
+      val organism = world.getOrganismById(id).get
+      val result = world.eat(organism)
+      result match {
+        case Success(newWorld) =>
+          sender ! WorldView(newWorld)
+          stay using newWorld
+        case Failure(e) =>
           sender ! akka.actor.Status.Failure(e)
           stay
       }
 
     case Event(Intention.Drink(id), world) =>
-      try {
-        val organism = world.getOrganismById(id).get
-        val newWorld = world.drink(organism)
-        sender ! WorldView(newWorld)
-        stay using newWorld
-      } catch {
-        case e: World.InvalidOperationException =>
+      val organism = world.getOrganismById(id).get
+      val result = world.drink(organism)
+      result match {
+        case Success(newWorld) =>
+          sender ! WorldView(newWorld)
+          stay using newWorld
+        case Failure(e) =>
           sender ! akka.actor.Status.Failure(e)
           stay
       }
