@@ -26,7 +26,7 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
   var clients: Map[Seq[Byte], Game.Intention] = Map.empty
   implicit val timeout = Timeout(5 seconds)
 
-  override def preStart() {
+  override def preStart {
     context.system.scheduler.schedule(1 second, 1 second, self, Tick)
   }
 

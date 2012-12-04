@@ -32,10 +32,10 @@ object Game {
 }
 
 // The game FSM.
-class Game extends Actor with FSM[Game.State, World] {
+class Game(world: World) extends Actor with FSM[Game.State, World] {
   import Game._
 
-  startWith(Idle, World(cells = Set.empty))
+  startWith(Idle, world)
   when(Idle) {
     case Event(Tick, world) =>
       stay using world.tick
