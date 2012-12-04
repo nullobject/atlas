@@ -47,16 +47,15 @@ case class World(cells: Set[Cell], age: Int = 0) {
 
   // Moves the given organism in the given direction.
   def move(organism: Organism, direction: Vector2) = {
-    try {
-      val from = getCellForOrganism(organism).get
-      val to = getAdjacentCell(from, direction).get
-      val newFrom = from.copy(organisms = from.organisms - organism)
-      val newTo = to.copy(organisms = to.organisms + organism)
-      copy(cells = cells - from + newFrom - to + newTo)
-    } catch {
-      case e: NoSuchElementException =>
-        throw new InvalidOperationException("Invalid cell")
-    }
+    val fromOption = getCellForOrganism(organism)
+    if (fromOption.isEmpty) throw new InvalidOperationException("Unknown organism")
+    val toOption = getAdjacentCell(fromOption.get, direction)
+    if (toOption.isEmpty) throw new InvalidOperationException("Invalid cell")
+    val from = fromOption.get
+    val to = toOption.get
+    val newFrom = from.copy(organisms = from.organisms - organism)
+    val newTo = to.copy(organisms = to.organisms + organism)
+    copy(cells = cells - from + newFrom - to + newTo)
   }
 
   // Decrements the food in the cell containing the given organism.
