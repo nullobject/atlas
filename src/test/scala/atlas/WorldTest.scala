@@ -70,6 +70,19 @@ class WorldTest extends FunSpec {
     }
   }
 
+  describe("#spawn") {
+    it("should spawn the given organism") {
+      assert(world.organisms.contains(organism4) === false)
+      val result = world.spawn(organism4).get
+      assert(result.organisms.contains(organism4) === true)
+    }
+
+    it("should throw an error when spawning an organism which is already spawned") {
+      assert(world.organisms.contains(organism1) === true)
+      intercept[World.InvalidOperationException] { world.spawn(organism1).get }
+    }
+  }
+
   describe("#move") {
     it("should move the given organism in the given direction") {
       assert(world.getCellForOrganism(organism1).get.position === (0, 0))

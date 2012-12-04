@@ -42,6 +42,7 @@ An organsim can only mate with another organism if they are genetically compatib
 
 # Messages
 
+* When the client connects a number of organisms are spawned.
 * The client requests the world view.
 * The server responds to the client with a world view.
 * The server processes the intention.
@@ -106,12 +107,14 @@ Attack:
 
     {
       "action": "attack",
-      "organismId": "123"
+      "organismId": "123",
+      "targetId": "456"
     }
 
 Mate:
 
     {
       "action": "mate",
-      "organismId": "123"
+      "organismId": "123",
+      "targetId": "456"
     }

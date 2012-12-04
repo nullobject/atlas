@@ -19,6 +19,9 @@ object Game {
     // Do nothing.
     case object Idle extends Intention
 
+    // Spawns an organsim.
+    case object Spawn extends Intention
+
     // The given organism should consume a unit of food in the current cell.
     case class Eat(organismId: UUID) extends Intention
 
@@ -48,42 +51,35 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
       sender ! WorldView(world)
       stay
 
+    case Event(Intention.Spawn, world) =>
+      val organism = Organism()
+      val result = world.spawn(organism)
+      processResult(result)
+
     case Event(Intention.Move(id, direction), world) =>
       val organism = world.getOrganismById(id).get
       val result = world.move(organism, direction)
-      result match {
-        case Success(newWorld) =>
-          sender ! WorldView(newWorld)
-          stay using newWorld
-        case Failure(e) =>
-          sender ! akka.actor.Status.Failure(e)
-          stay
-      }
+      processResult(result)
 
     case Event(Intention.Eat(id), world) =>
       val organism = world.getOrganismById(id).get
       val result = world.eat(organism)
-      result match {
-        case Success(newWorld) =>
-          sender ! WorldView(newWorld)
-          stay using newWorld
-        case Failure(e) =>
-          sender ! akka.actor.Status.Failure(e)
-          stay
-      }
+      processResult(result)
 
     case Event(Intention.Drink(id), world) =>
       val organism = world.getOrganismById(id).get
       val result = world.drink(organism)
-      result match {
-        case Success(newWorld) =>
-          sender ! WorldView(newWorld)
-          stay using newWorld
-        case Failure(e) =>
-          sender ! akka.actor.Status.Failure(e)
-          stay
-      }
+      processResult(result)
   }
 
   initialize
+
+  private def processResult(result: Try[World]) = result match {
+    case Success(world) =>
+      sender ! WorldView(world)
+      stay using world
+    case Failure(e) =>
+      sender ! akka.actor.Status.Failure(e)
+      stay
+  }
 }

@@ -22,7 +22,7 @@ object JsonFormats extends DefaultJsonProtocol {
 
   implicit object IntentionFormat extends RootJsonFormat[Game.Intention] {
     def write(intention: Game.Intention) = intention match {
-      case Game.Intention.Idle => JsObject(
+      case Game.Intention.Idle | Game.Intention.Spawn => JsObject(
         "action" -> JsString(intention.getClass.getSimpleName)
       )
       case Game.Intention.Eat(organismId) => JsObject(
@@ -46,6 +46,8 @@ object JsonFormats extends DefaultJsonProtocol {
       fields.get("action").get match {
         case JsString("Idle") =>
           Game.Intention.Idle
+        case JsString("Spawn") =>
+          Game.Intention.Spawn
         case JsString("Eat") =>
           Game.Intention.Eat(fields.get("organismId").get.convertTo[UUID])
         case JsString("Drink") =>
