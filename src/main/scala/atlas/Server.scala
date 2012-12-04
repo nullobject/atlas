@@ -27,7 +27,7 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
   implicit val timeout = Timeout(5 seconds)
 
   override def preStart {
-    context.system.scheduler.schedule(1 second, 1 second, self, Tick)
+    context.system.scheduler.schedule(0.1 second, 0.1 second, self, Tick)
   }
 
   override def postRestart(reason: Throwable) {
@@ -36,27 +36,24 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case Tick =>
-      processClientIntentions
+      clients.map {
+        case (address, intention) =>
+          val future = ask(game, intention).mapTo[WorldView]
+          future map { case worldView =>
+            router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
+          } onFailure { case e =>
+            router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(e.getMessage)))
+          }
+      }
+      clients = Map.empty
       game ! Game.Tick
 
     case message: ZMQMessage =>
-      log.debug(s"Received: $message")
-
       val address = message.frames(0).payload
       val json = new String(message.frames(2).payload.toArray, "UTF-8")
       val intention = Game.Intention.deserialize(json)
 
       // Store the client address to intention mapping.
       clients += (address -> intention)
-  }
-
-  def processClientIntentions = clients.map {
-    case (address, intention) =>
-      log.debug(s"Intention: $intention")
-      val future = ask(game, intention).mapTo[WorldView]
-      future.map { worldView =>
-        log.debug(s"Result: $worldView")
-        router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
-      }
   }
 }

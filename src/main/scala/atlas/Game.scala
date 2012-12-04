@@ -36,28 +36,51 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
   import Game._
 
   startWith(Idle, world)
+
   when(Idle) {
     case Event(Tick, world) =>
       stay using world.tick
+
     case Event(Intention.Idle, world) =>
       sender ! WorldView(world)
       stay
+
     case Event(Intention.Move(id, direction), world) =>
-      /* val organism = world.getOrganismById(id).get */
-      /* val newWorld = world.move(organism, direction) */
-      val newWorld = world
-      sender ! WorldView(newWorld)
-      stay using newWorld
+      try {
+        val organism = world.getOrganismById(id).get
+        val newWorld = world.move(organism, direction)
+        sender ! WorldView(newWorld)
+        stay using newWorld
+      } catch {
+        case e: World.InvalidOperationException =>
+          sender ! akka.actor.Status.Failure(e)
+          stay
+      }
+
     case Event(Intention.Eat(id), world) =>
-      val organism = world.getOrganismById(id).get
-      val newWorld = world.eat(organism)
-      sender ! WorldView(newWorld)
-      stay using newWorld
+      try {
+        val organism = world.getOrganismById(id).get
+        val newWorld = world.eat(organism)
+        sender ! WorldView(newWorld)
+        stay using newWorld
+      } catch {
+        case e: World.InvalidOperationException =>
+          sender ! akka.actor.Status.Failure(e)
+          stay
+      }
+
     case Event(Intention.Drink(id), world) =>
-      val organism = world.getOrganismById(id).get
-      val newWorld = world.drink(organism)
-      sender ! WorldView(newWorld)
-      stay using newWorld
+      try {
+        val organism = world.getOrganismById(id).get
+        val newWorld = world.drink(organism)
+        sender ! WorldView(newWorld)
+        stay using newWorld
+      } catch {
+        case e: World.InvalidOperationException =>
+          sender ! akka.actor.Status.Failure(e)
+          stay
+      }
   }
+
   initialize
 }
