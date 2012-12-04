@@ -1,7 +1,7 @@
 package atlas
 
 import java.util.UUID
-import scala.util.{Try, Success, Failure, Random}
+import scala.util.{Failure, Success, Try, Random}
 
 case class Cell(
   // The cell position.

@@ -41,7 +41,7 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
           val future = ask(game, intention).mapTo[WorldView]
           future map { case worldView =>
             router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(worldView.serialize)))
-          } onFailure { case e =>
+          } onFailure { case e: World.InvalidOperationException =>
             router ! ZMQMessage(List(Frame(address), Frame(Nil), Frame(e.getMessage)))
           }
       }

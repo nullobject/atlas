@@ -2,7 +2,7 @@ package atlas
 
 import akka.actor.{Actor, FSM}
 import java.util.UUID
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 import spray.json._
 import JsonFormats._
 
@@ -54,22 +54,22 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
     case Event(Intention.Spawn, world) =>
       val organism = Organism()
       val result = world.spawn(organism)
-      processResult(result)
+      stay using processResult(result)
 
     case Event(Intention.Move(id, direction), world) =>
       val organism = world.getOrganismById(id).get
       val result = world.move(organism, direction)
-      processResult(result)
+      stay using processResult(result)
 
     case Event(Intention.Eat(id), world) =>
       val organism = world.getOrganismById(id).get
       val result = world.eat(organism)
-      processResult(result)
+      stay using processResult(result)
 
     case Event(Intention.Drink(id), world) =>
       val organism = world.getOrganismById(id).get
       val result = world.drink(organism)
-      processResult(result)
+      stay using processResult(result)
   }
 
   initialize
@@ -77,9 +77,9 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
   private def processResult(result: Try[World]) = result match {
     case Success(world) =>
       sender ! WorldView(world)
-      stay using world
+      world
     case Failure(e) =>
       sender ! akka.actor.Status.Failure(e)
-      stay
+      stateData
   }
 }

@@ -5,7 +5,7 @@ import akka.actor.{ActorSystem, Props}
 object Main {
   val system = ActorSystem()
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val size = 4
     val cells = for (x <- 0 until size; y <- 0 until size) yield Cell(position = (x, y))
     val world = World(cells = cells.toSet)
