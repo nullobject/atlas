@@ -16,7 +16,13 @@ case class Cell(
   organisms: Set[Organism] = Set.empty
 )
 
+object World {
+  class InvalidOperationException(message: String) extends RuntimeException(message)
+}
+
 case class World(cells: Set[Cell], age: Int = 0) {
+  import World._
+
   // Returns the organisms.
   def organisms = cells.flatMap { _.organisms }
 
@@ -41,16 +47,22 @@ case class World(cells: Set[Cell], age: Int = 0) {
 
   // Moves the given organism in the given direction.
   def move(organism: Organism, direction: Vector2) = {
-    val from = getCellForOrganism(organism).get
-    val to = getAdjacentCell(from, direction).get
-    val newFrom = from.copy(organisms = from.organisms - organism)
-    val newTo = to.copy(organisms = to.organisms + organism)
-    copy(cells = cells - from + newFrom - to + newTo)
+    try {
+      val from = getCellForOrganism(organism).get
+      val to = getAdjacentCell(from, direction).get
+      val newFrom = from.copy(organisms = from.organisms - organism)
+      val newTo = to.copy(organisms = to.organisms + organism)
+      copy(cells = cells - from + newFrom - to + newTo)
+    } catch {
+      case e: NoSuchElementException =>
+        throw new InvalidOperationException("Invalid cell")
+    }
   }
 
   // Decrements the food in the cell containing the given organism.
   def eat(organism: Organism) = {
     val from = getCellForOrganism(organism).get
+    if (from.food == 0) throw new InvalidOperationException("No food in cell")
     val newFrom = from.copy(food = from.food - 1)
     copy(cells = cells - from + newFrom)
   }
@@ -58,6 +70,7 @@ case class World(cells: Set[Cell], age: Int = 0) {
   // Decrements the water in the cell containing the given organism.
   def drink(organism: Organism) = {
     val from = getCellForOrganism(organism).get
+    if (from.water == 0) throw new InvalidOperationException("No water in cell")
     val newFrom = from.copy(water = from.water - 1)
     copy(cells = cells - from + newFrom)
   }
