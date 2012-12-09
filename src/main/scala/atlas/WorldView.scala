@@ -10,15 +10,16 @@ import JsonFormats._
  * location.
  */
 case class WorldView(
-  // The organisms controlled by the player.
-  organisms: Set[Organism],
-
   // The cells visible to the player.
-  cells: Set[Cell]
+  cells: Set[Cell],
+
+  // The age of the world.
+  age: Int = 0
 ) {
   def serialize = this.toJson.compactPrint
 }
 
 object WorldView {
-  def apply(world: World) = new WorldView(organisms = world.organisms, cells = world.cells)
+  def apply(world: World) =
+    new WorldView(cells = world.cells, age = world.age)
 }

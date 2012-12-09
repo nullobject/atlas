@@ -4,13 +4,16 @@
 * Each cell has food and water.
 * Each cell has an elevation.
 
-## How the game works
-
-### Habitat
-
 A organism prefers to live in a biome based on their genes. Occupying cells within a organism's preferred biome consumes the least amount of energy.
 
 For example, a desert dweller prefers not to exist within a forest biome.
+
+## How the game works
+
+### Spawning
+
+A player can join a game at any time. When a player connects a number of
+organisms are randomly spawned into the world for them.
 
 ### Movement
 
@@ -50,15 +53,14 @@ An organsim can only mate with another organism if they are genetically compatib
 # Tick
 
     {
-      "organisms": [{"id": "123", "health": 100}],
       "cells": [
         {
           "position": [0, 0],
           "food": 1,
           "water": 2,
           "organisms": [
-            {"id": "123", "health": 100}
-            {"id": "456", "health": 99}
+            {"id": "123", "health": 100, "playerId": "abc"}
+            {"id": "456", "health": 99, "playerId": "def"}
           ]
         }, {
           "position": [1, 0],
@@ -88,19 +90,22 @@ Move:
 
     {
       "action": "move",
+      "organismId": "123",
       "direction": "NW"
     }
 
 Eat:
 
     {
-      "action": "eat"
+      "action": "eat",
+      "organismId": "123"
     }
 
 Drink:
 
     {
-      "action": "drink"
+      "action": "drink",
+      "organismId": "123"
     }
 
 Attack:
