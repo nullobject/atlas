@@ -1,10 +1,7 @@
 package atlas
 
 import akka.actor.{Actor, FSM}
-import java.util.UUID
 import scala.util.{Failure, Success, Try}
-import spray.json._
-import JsonFormats._
 
 object Game {
   sealed trait State
@@ -12,29 +9,6 @@ object Game {
 
   sealed trait Message
   case object Tick extends Message
-
-  sealed trait Intention
-
-  object Intention {
-    // Do nothing.
-    case object Idle extends Intention
-
-    // Spawns an organsim.
-    case object Spawn extends Intention
-
-    // The given organism should consume a unit of food in the current cell.
-    case class Eat(organismId: UUID) extends Intention
-
-    // The given organism should consume a unit of water in the current cell.
-    case class Drink(organismId: UUID) extends Intention
-
-    // The given organism should move in the given direction.
-    case class Move(organismId: UUID, direction: Vector2) extends Intention
-
-    def deserialize(value: String) = value.asJson.convertTo[Intention]
-  }
-
-  case class PlayerIntention(playerId: UUID, intention: Intention)
 }
 
 /**
@@ -49,31 +23,31 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
     case Event(Tick, world) =>
       stay using world.tick.get
 
-    case Event(PlayerIntention(playerId, Intention.Idle), world) =>
+    case Event(Player.Intention(playerId, Player.Action.Idle), world) =>
       sender ! WorldView(world)
       stay
 
-    case Event(PlayerIntention(playerId, Intention.Spawn), world) =>
+    case Event(Player.Intention(playerId, Player.Action.Spawn), world) =>
       val genome = Genome("Rat", Map("FeedAmount" -> 1, "FeedFrequency" -> 2, "ReproduceFrequency" -> 3))
       val organism = Organism(playerId = playerId, genome = genome)
       val result = world.spawn(organism)
       stay using processResult(result)
 
-    case Event(PlayerIntention(playerId, Intention.Move(id, direction)), world) =>
+    case Event(Player.Intention(playerId, Player.Action.Move(id, direction)), world) =>
       val organism = world.getOrgansim(id).get
       if (organism.playerId != playerId)
         throw new RuntimeException("Not your organsim")
       val result = world.move(organism, direction)
       stay using processResult(result)
 
-    case Event(PlayerIntention(playerId, Intention.Eat(id)), world) =>
+    case Event(Player.Intention(playerId, Player.Action.Eat(id)), world) =>
       val organism = world.getOrgansim(id).get
       if (organism.playerId != playerId)
         throw new RuntimeException("Not your organsim")
       val result = world.eat(organism)
       stay using processResult(result)
 
-    case Event(PlayerIntention(playerId, Intention.Drink(id)), world) =>
+    case Event(Player.Intention(playerId, Player.Action.Drink(id)), world) =>
       val organism = world.getOrgansim(id).get
       if (organism.playerId != playerId)
         throw new RuntimeException("Not your organsim")

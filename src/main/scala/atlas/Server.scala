@@ -25,7 +25,7 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
 
   implicit val timeout = Timeout(5 seconds)
   val router = ZeroMQExtension(context.system).newSocket(SocketType.Router, Listener(self), Bind("tcp://127.0.0.1:1235"), HighWatermark(1000))
-  var clients: Map[Seq[Byte], Game.PlayerIntention] = Map.empty
+  var clients: Map[Seq[Byte], Player.Intention] = Map.empty
 
   override def preStart {
     context.system.scheduler.schedule(0.1 second, 0.1 second, self, Tick)
@@ -53,8 +53,8 @@ class Server(game: ActorRef) extends Actor with ActorLogging {
       val address = message.frames(0).payload
       val playerId = UUID.fromString(new String(address.toArray, "UTF-8"))
       val json = new String(message.frames(2).payload.toArray, "UTF-8")
-      val intention = Game.Intention.deserialize(json)
-      val playerIntention = Game.PlayerIntention(playerId, intention)
+      val action = Player.Action.deserialize(json)
+      val playerIntention = Player.Intention(playerId, action)
 
       // Store the client address to player intention mapping.
       clients += (address -> playerIntention)

@@ -20,46 +20,46 @@ object JsonFormats extends DefaultJsonProtocol {
     }
   }
 
-  implicit object IntentionFormat extends RootJsonFormat[Game.Intention] {
-    def write(intention: Game.Intention) = intention match {
-      case Game.Intention.Idle | Game.Intention.Spawn => JsObject(
-        "action" -> JsString(intention.getClass.getSimpleName)
+  implicit object PlayerActionFormat extends RootJsonFormat[Player.Action] {
+    def write(action: Player.Action) = action match {
+      case Player.Action.Idle | Player.Action.Spawn => JsObject(
+        "action" -> JsString(action.getClass.getSimpleName)
       )
-      case Game.Intention.Eat(organismId) => JsObject(
-        "action" -> JsString(intention.getClass.getSimpleName),
+      case Player.Action.Eat(organismId) => JsObject(
+        "action" -> JsString(action.getClass.getSimpleName),
         "organismId" -> organismId.toJson
       )
-      case Game.Intention.Drink(organismId) => JsObject(
-        "action" -> JsString(intention.getClass.getSimpleName),
+      case Player.Action.Drink(organismId) => JsObject(
+        "action" -> JsString(action.getClass.getSimpleName),
         "organismId" -> organismId.toJson
       )
-      case Game.Intention.Move(organismId, direction) => JsObject(
-        "action" -> JsString(intention.getClass.getSimpleName),
+      case Player.Action.Move(organismId, direction) => JsObject(
+        "action" -> JsString(action.getClass.getSimpleName),
         "organismId" -> organismId.toJson,
         "direction" -> direction.toJson
       )
-      case _ => throw new DeserializationException("Unknown intention")
+      case _ => throw new DeserializationException("Unknown action")
     }
 
     def read(value: JsValue) = {
       val fields = value.asJsObject.fields
       fields.get("action").get match {
         case JsString("Idle") =>
-          Game.Intention.Idle
+          Player.Action.Idle
         case JsString("Spawn") =>
-          Game.Intention.Spawn
+          Player.Action.Spawn
         case JsString("Eat") =>
-          Game.Intention.Eat(fields.get("organismId").get.convertTo[UUID])
+          Player.Action.Eat(fields.get("organismId").get.convertTo[UUID])
         case JsString("Drink") =>
-          Game.Intention.Drink(fields.get("organismId").get.convertTo[UUID])
+          Player.Action.Drink(fields.get("organismId").get.convertTo[UUID])
         case JsString("Move")  =>
-          Game.Intention.Move(fields.get("organismId").get.convertTo[UUID], fields.get("direction").get.convertTo[Vector2])
-        case _ => throw new DeserializationException("Intention expected")
+          Player.Action.Move(fields.get("organismId").get.convertTo[UUID], fields.get("direction").get.convertTo[Vector2])
+        case _ => throw new DeserializationException("Action expected")
       }
     }
   }
 
-  implicit val playerIntentionFormat = jsonFormat2(Game.PlayerIntention.apply)
+  implicit val playerIntentionFormat = jsonFormat2(Player.Intention.apply)
   implicit val genomeFormat          = jsonFormat2(Genome.apply)
   implicit val organismFormat        = jsonFormat4(Organism.apply)
   implicit val cellFormat            = jsonFormat4(Cell.apply)
