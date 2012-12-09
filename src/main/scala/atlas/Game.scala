@@ -33,6 +33,8 @@ object Game {
 
     def deserialize(value: String) = value.asJson.convertTo[Intention]
   }
+
+  case class PlayerIntention(playerId: UUID, intention: Intention)
 }
 
 /**
@@ -47,27 +49,34 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
     case Event(Tick, world) =>
       stay using world.tick.get
 
-    case Event(Intention.Idle, world) =>
+    case Event(PlayerIntention(playerId, Intention.Idle), world) =>
       sender ! WorldView(world)
       stay
 
-    case Event(Intention.Spawn, world) =>
-      val organism = Organism()
+    case Event(PlayerIntention(playerId, Intention.Spawn), world) =>
+      val genome = Genome("Rat", Map("FeedAmount" -> 1, "FeedFrequency" -> 2, "ReproduceFrequency" -> 3))
+      val organism = Organism(playerId = playerId, genome = genome)
       val result = world.spawn(organism)
       stay using processResult(result)
 
-    case Event(Intention.Move(id, direction), world) =>
-      val organism = world.getOrganismById(id).get
+    case Event(PlayerIntention(playerId, Intention.Move(id, direction)), world) =>
+      val organism = world.getOrgansim(id).get
+      if (organism.playerId != playerId)
+        throw new RuntimeException("Not your organsim")
       val result = world.move(organism, direction)
       stay using processResult(result)
 
-    case Event(Intention.Eat(id), world) =>
-      val organism = world.getOrganismById(id).get
+    case Event(PlayerIntention(playerId, Intention.Eat(id)), world) =>
+      val organism = world.getOrgansim(id).get
+      if (organism.playerId != playerId)
+        throw new RuntimeException("Not your organsim")
       val result = world.eat(organism)
       stay using processResult(result)
 
-    case Event(Intention.Drink(id), world) =>
-      val organism = world.getOrganismById(id).get
+    case Event(PlayerIntention(playerId, Intention.Drink(id)), world) =>
+      val organism = world.getOrgansim(id).get
+      if (organism.playerId != playerId)
+        throw new RuntimeException("Not your organsim")
       val result = world.drink(organism)
       stay using processResult(result)
   }
@@ -76,6 +85,7 @@ class Game(world: World) extends Actor with FSM[Game.State, World] {
 
   private def processResult(result: Try[World]) = result match {
     case Success(world) =>
+      // TODO: scope world view to player.
       sender ! WorldView(world)
       world
     case Failure(e) =>

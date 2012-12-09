@@ -6,6 +6,9 @@ case class Organism(
   // The organism ID.
   id: UUID = UUID.randomUUID(),
 
+  // The player ID.
+  playerId: UUID = UUID.randomUUID(),
+
   // The organism genome.
   genome: Genome = Genome.empty,
 
