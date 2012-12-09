@@ -22,12 +22,12 @@ class WorldTest extends FunSpec {
     }
   }
 
-  describe("#getOrganismById") {
+  describe("#getOrgansim") {
     it("should return the organism with the given ID") {
-      assert(world.getOrganismById(organism1.id) === Some(organism1))
-      assert(world.getOrganismById(organism2.id) === Some(organism2))
-      assert(world.getOrganismById(organism3.id) === Some(organism3))
-      assert(world.getOrganismById(organism4.id) === None)
+      assert(world.getOrgansim(organism1.id) === Some(organism1))
+      assert(world.getOrgansim(organism2.id) === Some(organism2))
+      assert(world.getOrgansim(organism3.id) === Some(organism3))
+      assert(world.getOrgansim(organism4.id) === None)
     }
   }
 

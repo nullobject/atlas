@@ -21,14 +21,20 @@ object World {
   case class InvalidOperationException(message: String) extends RuntimeException(message)
 }
 
-case class World(cells: Set[Cell], age: Int = 0) {
+case class World(
+  // The cells in the world.
+  cells: Set[Cell],
+
+  // The age of the world.
+  age: Int = 0
+) {
   import World._
 
   // Returns the organisms.
   def organisms = cells.flatMap { _.organisms }
 
   // Returns the organism with the given ID.
-  def getOrganismById(id: UUID) =
+  def getOrgansim(id: UUID) =
     cells.flatMap { _.organisms.find { _.id == id } }.headOption
 
   // Returns the cell at the given position.
