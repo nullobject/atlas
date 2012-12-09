@@ -16,7 +16,7 @@ object JsonFormats extends DefaultJsonProtocol {
     def write(v: Vector2) = JsArray(JsNumber(v.x), JsNumber(v.y))
     def read(value: JsValue) = value match {
       case JsArray(JsNumber(x) :: JsNumber(y) :: Nil) => Vector2(x.toInt, y.toInt)
-      case _ => throw new DeserializationException("Color expected")
+      case _ => throw new DeserializationException("Vector2 expected")
     }
   }
 

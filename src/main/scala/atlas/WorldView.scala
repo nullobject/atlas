@@ -1,6 +1,7 @@
 package atlas
 
 import spray.json._
+import java.util.UUID
 import JsonFormats._
 
 /**
@@ -20,6 +21,10 @@ case class WorldView(
 }
 
 object WorldView {
-  def apply(world: World) =
-    new WorldView(cells = world.cells, age = world.age)
+  def scopeToPlayer(playerId: UUID, world: World) = {
+    val playerCells = world.getCellsForPlayer(playerId)
+    val surroundingCells = playerCells.flatMap { world.getSurroundingCells(_) }
+    val cells = playerCells | surroundingCells
+    WorldView(cells = cells, age = world.age)
+  }
 }

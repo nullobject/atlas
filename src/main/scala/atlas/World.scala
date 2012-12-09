@@ -49,6 +49,16 @@ case class World(
   def getAdjacentCell(cell: Cell, direction: Vector2) =
     getCellAtPosition(cell.position + direction)
 
+  /* // Returns the cells surrounding the given cell. */
+  def getSurroundingCells(cell: Cell) = {
+    val directions = Set(Direction.N, Direction.NE, Direction.E, Direction.SE, Direction.S, Direction.SW, Direction.W, Direction.NW)
+    directions.flatMap { getAdjacentCell(cell, _) }
+  }
+
+  // Returns the cells which contain organisims for the given player.
+  def getCellsForPlayer(playerId: UUID) =
+    cells.filter { _.organisms.find { _.playerId == playerId }.isDefined }
+
   // Ticks the world state.
   def tick: Try[World] = Success(copy(age = age + 1))
 

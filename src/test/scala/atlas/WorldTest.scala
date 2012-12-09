@@ -63,6 +63,18 @@ class WorldTest extends FunSpec {
     }
   }
 
+  describe("#getSurroundingCells") {
+    it("should return the cells surrounding the given cell") {
+      assert(world.getSurroundingCells(cell1) === Set(cell2, cell3, cell4))
+    }
+  }
+
+  describe("#getCellsForPlayer") {
+    it("should return the cells containing organisms for the given player") {
+      assert(world.getCellsForPlayer(organism1.playerId) === Set(cell1))
+    }
+  }
+
   describe("#tick") {
     it("should increment the age") {
       assert(world.age === 0)
