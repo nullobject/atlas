@@ -10,7 +10,7 @@ object Game {
   sealed trait State
   case object Idle extends State
 
-  case class StateData(world: World, callbacks: Map[ActorRef, Any])
+  case class StateData(world: World, callbacks: Map[ActorRef, UUID])
 
   sealed trait Message
   case object Tick extends Message
@@ -20,8 +20,6 @@ object Game {
  * The game FSM receives players' intentions from the server and executes them.
  * On every tick event the game responds to the players' requests with their
  * world views.
- *
- * TODO: send the latest world state when responding to clients.
  */
 class Game(world: World) extends Actor with FSM[Game.State, Game.StateData] {
   import context.dispatcher
@@ -39,7 +37,10 @@ class Game(world: World) extends Actor with FSM[Game.State, Game.StateData] {
 
   when(Idle) {
     case Event(Tick, stateData) =>
-      stateData.callbacks.foreach { case (actor, worldView) => actor ! worldView }
+      stateData.callbacks.foreach {
+        case (actor, playerId) =>
+          actor ! WorldView.scopeToPlayer(playerId, stateData.world)
+      }
       stay using stateData.copy(world = stateData.world.tick.get, callbacks = Map.empty)
 
     case Event(Player.Intention(playerId, Player.Action.Idle), stateData) =>
@@ -78,10 +79,10 @@ class Game(world: World) extends Actor with FSM[Game.State, Game.StateData] {
 
   private def processResult(stateData: StateData, playerId: UUID, result: Try[World]) = result match {
     case Success(world) =>
-      val callbacks = stateData.callbacks + (sender -> WorldView.scopeToPlayer(playerId, world))
+      val callbacks = stateData.callbacks + (sender -> playerId)
       stateData.copy(world = world, callbacks = callbacks)
     case Failure(e) =>
-      val callbacks = stateData.callbacks + (sender -> akka.actor.Status.Failure(e))
-      stateData.copy(callbacks = callbacks)
+      sender ! akka.actor.Status.Failure(e)
+      stateData
   }
 }
