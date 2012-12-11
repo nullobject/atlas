@@ -2,6 +2,8 @@ package atlas
 
 import java.util.UUID
 import scala.util.{Failure, Success, Try, Random}
+import spray.json._
+import JsonFormats._
 
 case class Cell(
   // The cell position.
@@ -19,6 +21,27 @@ case class Cell(
 
 object World {
   case class InvalidOperationException(message: String) extends RuntimeException(message)
+
+  sealed trait Action
+
+  object Action {
+    // Do nothing.
+    case object Idle extends Action
+
+    // Spawns an organsim.
+    case object Spawn extends Action
+
+    // The given organism should consume a unit of food in the current cell.
+    case class Eat(organismId: UUID) extends Action
+
+    // The given organism should consume a unit of water in the current cell.
+    case class Drink(organismId: UUID) extends Action
+
+    // The given organism should move in the given direction.
+    case class Move(organismId: UUID, direction: Vector2) extends Action
+
+    def deserialize(value: String) = value.asJson.convertTo[Action]
+  }
 }
 
 case class World(

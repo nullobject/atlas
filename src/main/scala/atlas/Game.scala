@@ -43,32 +43,32 @@ class Game(world: World) extends Actor with FSM[Game.State, Game.StateData] {
       }
       stay using stateData.copy(world = stateData.world.tick.get, callbacks = Map.empty)
 
-    case Event(Player.Intention(playerId, Player.Action.Idle), stateData) =>
+    case Event(Player.Intention(playerId, World.Action.Idle), stateData) =>
       stay using processResult(stateData, playerId, Success(stateData.world))
 
-    case Event(Player.Intention(playerId, Player.Action.Spawn), stateData) =>
+    case Event(Player.Intention(playerId, World.Action.Spawn), stateData) =>
       // TODO: choose a genome.
       val genome = Genome("Rat", Map("FeedAmount" -> 1, "FeedFrequency" -> 2, "ReproduceFrequency" -> 3))
       val organism = Organism(playerId = playerId, genome = genome)
       val result = stateData.world.spawn(organism)
       stay using processResult(stateData, playerId, result)
 
-    case Event(Player.Intention(playerId, Player.Action.Move(id, direction)), stateData) =>
-      val organism = stateData.world.getOrgansim(id).get
+    case Event(Player.Intention(playerId, World.Action.Move(organismId, direction)), stateData) =>
+      val organism = stateData.world.getOrgansim(organismId).get
       if (organism.playerId != playerId)
         throw new RuntimeException("Not your organsim")
       val result = stateData.world.move(organism, direction)
       stay using processResult(stateData, playerId, result)
 
-    case Event(Player.Intention(playerId, Player.Action.Eat(id)), stateData) =>
-      val organism = stateData.world.getOrgansim(id).get
+    case Event(Player.Intention(playerId, World.Action.Eat(organismId)), stateData) =>
+      val organism = stateData.world.getOrgansim(organismId).get
       if (organism.playerId != playerId)
         throw new RuntimeException("Not your organsim")
       val result = stateData.world.eat(organism)
       stay using processResult(stateData, playerId, result)
 
-    case Event(Player.Intention(playerId, Player.Action.Drink(id)), stateData) =>
-      val organism = stateData.world.getOrgansim(id).get
+    case Event(Player.Intention(playerId, World.Action.Drink(organismId)), stateData) =>
+      val organism = stateData.world.getOrgansim(organismId).get
       if (organism.playerId != playerId)
         throw new RuntimeException("Not your organsim")
       val result = stateData.world.drink(organism)
