@@ -10,9 +10,8 @@ import spray.routing.HttpServiceActor
 import spray.httpx.SprayJsonSupport
 
 /**
- * The server manages client connections. Clients may submit their requests
- * intentions to the server for each game "tick". When the server processes the
- * client intentions the responses (world views) are returned to the client.
+ * The server wraps player actions in an intention and forwards them to the
+ * game. When the game responds the server completes the request.
  */
 class Server(game: ActorRef) extends Actor with HttpServiceActor with SprayJsonSupport {
   import JsonFormats._
@@ -23,7 +22,7 @@ class Server(game: ActorRef) extends Actor with HttpServiceActor with SprayJsonS
     headerValueByName("X-Player") { player =>
       path("intentions") {
         post {
-          entity(as[World.Action]) { action =>
+          entity(as[Player.Action]) { action =>
             val playerId = UUID.fromString(player)
             val playerIntention = Player.Intention(playerId, action)
             val response = ask(game, playerIntention).mapTo[WorldView]

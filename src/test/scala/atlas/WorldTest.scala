@@ -1,7 +1,6 @@
 package atlas
 
 import org.scalatest.FunSpec
-import scala.util.{Failure, Success}
 
 class WorldTest extends FunSpec {
   val organism1 = Organism()
@@ -79,63 +78,67 @@ class WorldTest extends FunSpec {
     it("should increment the age") {
       assert(world.age === 0)
       val result = world.tick
-      assert(result.get.age === 1)
+      assert(result.age === 1)
     }
   }
 
   describe("#spawn") {
     it("should spawn the given organism") {
       assert(world.organisms.contains(organism4) === false)
-      val result = world.spawn(organism4).get
+      val result = world.spawn(organism4)
       assert(result.organisms.contains(organism4) === true)
     }
 
     it("should fail when spawning an organism which has already spawned") {
       assert(world.organisms.contains(organism1) === true)
-      val result = world.spawn(organism1)
-      assert(result === Failure(World.InvalidOperationException("Organism already spawned")))
+      intercept[World.InvalidOperationException] {
+        world.spawn(organism1)
+      }
     }
   }
 
   describe("#move") {
     it("should move the given organism in the given direction") {
       assert(world.getCellForOrganism(organism1).get.position === (0, 0))
-      val result = world.move(organism1, Direction.S).get
+      val result = world.move(organism1, Direction.S)
       assert(result.getCellForOrganism(organism1).get.position === (0, 1))
     }
 
     it("should fail when moving to an unkown cell") {
       assert(world.getCellForOrganism(organism1).get.position === (0, 0))
-      val result = world.move(organism1, Direction.N)
-      assert(result === Failure(World.InvalidOperationException("Invalid direction")))
+      intercept[World.InvalidOperationException] {
+        world.move(organism1, Direction.N)
+      }
     }
   }
 
   describe("#eat") {
     it("should decrement the food in the cell containing the given organism") {
       assert(world.getCellForOrganism(organism1).get.food === 100)
-      val result = world.eat(organism1).get
+      val result = world.eat(organism1)
       assert(result.getCellForOrganism(organism1).get.food === 99)
     }
 
     it("should fail when eating in a cell with no food") {
       assert(world.getCellForOrganism(organism2).get.food === 0)
-      val result = world.eat(organism2)
-      assert(result === Failure(World.InvalidOperationException("No food in cell")))
+      intercept[World.InvalidOperationException] {
+        world.eat(organism2)
+      }
     }
   }
 
   describe("#drink") {
     it("should decrement the water in the cell containing the given organism") {
       assert(world.getCellForOrganism(organism1).get.water === 100)
-      val result = world.drink(organism1).get
+      val result = world.drink(organism1)
       assert(result.getCellForOrganism(organism1).get.water === 99)
     }
 
     it("should fail when drinking in a cell with no water") {
       assert(world.getCellForOrganism(organism2).get.water === 0)
-      val result = world.drink(organism2)
-      assert(result === Failure(World.InvalidOperationException("No water in cell")))
+      intercept[World.InvalidOperationException] {
+        world.drink(organism2)
+      }
     }
   }
 }

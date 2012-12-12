@@ -1,9 +1,7 @@
 package atlas
 
 import java.util.UUID
-import scala.util.{Failure, Success, Try, Random}
-import spray.json._
-import JsonFormats._
+import scala.util.Random
 
 case class Cell(
   // The cell position.
@@ -21,29 +19,11 @@ case class Cell(
 
 object World {
   case class InvalidOperationException(message: String) extends RuntimeException(message)
-
-  sealed trait Action
-
-  object Action {
-    // Do nothing.
-    case object Idle extends Action
-
-    // Spawns an organsim.
-    case object Spawn extends Action
-
-    // The given organism should consume a unit of food in the current cell.
-    case class Eat(organismId: UUID) extends Action
-
-    // The given organism should consume a unit of water in the current cell.
-    case class Drink(organismId: UUID) extends Action
-
-    // The given organism should move in the given direction.
-    case class Move(organismId: UUID, direction: Vector2) extends Action
-
-    def deserialize(value: String) = value.asJson.convertTo[Action]
-  }
 }
 
+/*
+ * The world class contains the world state.
+ */
 case class World(
   // The cells in the world.
   cells: Set[Cell],
@@ -83,44 +63,44 @@ case class World(
     cells.filter { _.organisms.find { _.playerId == playerId }.isDefined }
 
   // Ticks the world state.
-  def tick: Try[World] = Success(copy(age = age + 1))
+  def tick: World = copy(age = age + 1)
 
   // Spawns the given organism into the world.
-  def spawn(organism: Organism): Try[World] = {
-    if (organisms.contains(organism)) return Failure(InvalidOperationException("Organism already spawned"))
+  def spawn(organism: Organism): World = {
+    if (organisms.contains(organism)) throw InvalidOperationException("Organism already spawned")
     val cell = Random.shuffle(cells).head
     val newCell = cell.copy(organisms = organisms + organism)
-    Success(copy(cells = cells - cell + newCell))
+    copy(cells = cells - cell + newCell)
   }
 
   // Moves the given organism in the given direction.
-  def move(organism: Organism, direction: Vector2): Try[World] = {
+  def move(organism: Organism, direction: Vector2): World = {
     val fromOption = getCellForOrganism(organism)
-    if (fromOption.isEmpty) return Failure(InvalidOperationException("Unknown organism"))
+    if (fromOption.isEmpty) throw InvalidOperationException("Unknown organism")
     val from = fromOption.get
 
     val toOption = getAdjacentCell(from, direction)
-    if (toOption.isEmpty) return Failure(InvalidOperationException("Invalid direction"))
+    if (toOption.isEmpty) throw InvalidOperationException("Invalid direction")
     val to = toOption.get
 
     val newFrom = from.copy(organisms = from.organisms - organism)
     val newTo = to.copy(organisms = to.organisms + organism)
-    Success(copy(cells = cells - from + newFrom - to + newTo))
+    copy(cells = cells - from + newFrom - to + newTo)
   }
 
   // Decrements the food in the cell containing the given organism.
-  def eat(organism: Organism): Try[World] = {
+  def eat(organism: Organism): World = {
     val from = getCellForOrganism(organism).get
-    if (from.food == 0) return Failure(InvalidOperationException("No food in cell"))
+    if (from.food == 0) throw InvalidOperationException("No food in cell")
     val newFrom = from.copy(food = from.food - 1)
-    Success(copy(cells = cells - from + newFrom))
+    copy(cells = cells - from + newFrom)
   }
 
   // Decrements the water in the cell containing the given organism.
-  def drink(organism: Organism): Try[World] = {
+  def drink(organism: Organism): World = {
     val from = getCellForOrganism(organism).get
-    if (from.water == 0) return Failure(InvalidOperationException("No water in cell"))
+    if (from.water == 0) throw InvalidOperationException("No water in cell")
     val newFrom = from.copy(water = from.water - 1)
-    Success(copy(cells = cells - from + newFrom))
+    copy(cells = cells - from + newFrom)
   }
 }

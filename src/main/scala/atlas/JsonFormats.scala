@@ -20,20 +20,20 @@ object JsonFormats extends DefaultJsonProtocol {
     }
   }
 
-  implicit object WorldActionFormat extends RootJsonFormat[World.Action] {
-    def write(action: World.Action) = action match {
-      case World.Action.Idle | World.Action.Spawn => JsObject(
+  implicit object PlayerActionFormat extends RootJsonFormat[Player.Action] {
+    def write(action: Player.Action) = action match {
+      case Player.Action.Idle => JsObject(
         "action" -> JsString(action.getClass.getSimpleName)
       )
-      case World.Action.Eat(organismId) => JsObject(
+      case Player.Action.Eat(organismId) => JsObject(
         "action" -> JsString(action.getClass.getSimpleName),
         "organismId" -> organismId.toJson
       )
-      case World.Action.Drink(organismId) => JsObject(
+      case Player.Action.Drink(organismId) => JsObject(
         "action" -> JsString(action.getClass.getSimpleName),
         "organismId" -> organismId.toJson
       )
-      case World.Action.Move(organismId, direction) => JsObject(
+      case Player.Action.Move(organismId, direction) => JsObject(
         "action" -> JsString(action.getClass.getSimpleName),
         "organismId" -> organismId.toJson,
         "direction" -> direction.toJson
@@ -45,15 +45,13 @@ object JsonFormats extends DefaultJsonProtocol {
       val fields = value.asJsObject.fields
       fields.get("action").get match {
         case JsString("Idle") =>
-          World.Action.Idle
-        case JsString("Spawn") =>
-          World.Action.Spawn
+          Player.Action.Idle
         case JsString("Eat") =>
-          World.Action.Eat(fields.get("organismId").get.convertTo[UUID])
+          Player.Action.Eat(fields.get("organismId").get.convertTo[UUID])
         case JsString("Drink") =>
-          World.Action.Drink(fields.get("organismId").get.convertTo[UUID])
+          Player.Action.Drink(fields.get("organismId").get.convertTo[UUID])
         case JsString("Move")  =>
-          World.Action.Move(fields.get("organismId").get.convertTo[UUID], fields.get("direction").get.convertTo[Vector2])
+          Player.Action.Move(fields.get("organismId").get.convertTo[UUID], fields.get("direction").get.convertTo[Vector2])
         case _ => throw new DeserializationException("Action expected")
       }
     }
