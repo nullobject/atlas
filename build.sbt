@@ -9,6 +9,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.1.0-RC3" cross CrossVersion.full,
+  "com.typesafe.akka" %% "akka-agent" % "2.1.0-RC3" cross CrossVersion.full,
   "com.typesafe.akka" %% "akka-testkit" % "2.1.0-RC3" % "test" cross CrossVersion.full,
   "io.spray" % "spray-can" % "1.1-M6",
   "io.spray" % "spray-httpx" % "1.1-M6",
