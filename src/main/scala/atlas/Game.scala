@@ -40,7 +40,7 @@ class Game(worldAgent: Agent[World]) extends Actor with FSM[Game.StateName, Game
       children.foreach { _ ! Tick }
       stay
 
-    case Event(Player.Intention(playerId, action), _) =>
+    case Event(Player.Request(playerId, action), _) =>
       getPlayer(playerId).forward(action)
       stay
   }

@@ -57,9 +57,9 @@ object JsonFormats extends DefaultJsonProtocol {
     }
   }
 
-  implicit val playerIntentionFormat = jsonFormat2(Player.Intention.apply)
-  implicit val genomeFormat          = jsonFormat2(Genome.apply)
-  implicit val organismFormat        = jsonFormat4(Organism.apply)
-  implicit val cellFormat            = jsonFormat4(Cell.apply)
-  implicit val worldViewFormat       = jsonFormat2(WorldView.apply)
+  implicit val playerRequestFormat = jsonFormat2(Player.Request.apply)
+  implicit val genomeFormat        = jsonFormat2(Genome.apply)
+  implicit val organismFormat      = jsonFormat4(Organism.apply)
+  implicit val cellFormat          = jsonFormat4(Cell.apply)
+  implicit val worldViewFormat     = jsonFormat2(WorldView.apply)
 }

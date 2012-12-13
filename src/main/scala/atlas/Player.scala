@@ -32,7 +32,7 @@ object Player {
     def deserialize(value: String) = value.asJson.convertTo[Action]
   }
 
-  case class Intention(playerId: UUID, action: Action)
+  case class Request(playerId: UUID, action: Action)
 
   sealed trait StateName
   case object Uninitialised extends StateName
