@@ -5,9 +5,10 @@ import akka.pattern.ask
 import akka.util.Timeout
 import java.util.UUID
 import scala.concurrent.duration._
-import scala.language.postfixOps
-import spray.routing.HttpServiceActor
+import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport
+import scala.language.postfixOps
+import spray.routing.{ExceptionHandler, HttpServiceActor}
 
 /**
  * The server wraps player actions in an intention and forwards them to the
@@ -17,6 +18,12 @@ class Server(game: ActorRef) extends Actor with HttpServiceActor with SprayJsonS
   import JsonFormats._
 
   implicit val timeout = Timeout(5 seconds)
+
+  implicit val exceptionHandler = ExceptionHandler.fromPF {
+    case e: Player.InvalidActionException => log => ctx =>
+      log.warning("Request {} could not be handled normally", ctx.request)
+      ctx.complete(UnprocessableEntity, e.getMessage)
+  }
 
   def receive = runRoute {
     headerValueByName("X-Player") { player =>
