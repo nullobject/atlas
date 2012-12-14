@@ -53,11 +53,7 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
 
   when(Uninitialised) {
     case Event(Action.Idle, stateData) =>
-      // TODO: spawn an organism.
-      val genome = Genome("Rat", Map("FeedAmount" -> 1, "FeedFrequency" -> 2, "ReproduceFrequency" -> 3))
-      val organism = Organism(playerId = playerId, genome = genome)
-      worldAgent.send(_.spawn(organism))
-      goto(Idle) using stateData.addSender(sender)
+      goto(Idle) using doSpawn(stateData)
 
     case Event(_: Action, _) =>
       sender ! Status.Failure(UninitializedException)
@@ -69,45 +65,18 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
       stay using stateData.addSender(sender)
 
     case Event(Action.Move(organismId, direction), stateData) =>
-      val world = worldAgent.get
-      val organism = world.getOrgansim(organismId)
-      if (organism.isEmpty) {
-        sender ! Status.Failure(UnknownOrganismException)
-        stay
-      } else if (organism.get.playerId != playerId) {
-        sender ! Status.Failure(InvalidOrganismException)
-        stay
-      } else {
-        worldAgent.send(_.move(organism.get, direction))
-        stay using stateData.addSender(sender)
+      stay using doAction(organismId, stateData) { (world, organism) =>
+        world.move(organism, direction)
       }
 
     case Event(Action.Eat(organismId), stateData) =>
-      val world = worldAgent.get
-      val organism = world.getOrgansim(organismId)
-      if (organism.isEmpty) {
-        sender ! Status.Failure(UnknownOrganismException)
-        stay
-      } else if (organism.get.playerId != playerId) {
-        sender ! Status.Failure(InvalidOrganismException)
-        stay
-      } else {
-        worldAgent.send(_.eat(organism.get))
-        stay using stateData.addSender(sender)
+      stay using doAction(organismId, stateData) { (world, organism) =>
+        world.eat(organism)
       }
 
     case Event(Action.Drink(organismId), stateData) =>
-      val world = worldAgent.get
-      val organism = world.getOrgansim(organismId)
-      if (organism.isEmpty) {
-        sender ! Status.Failure(UnknownOrganismException)
-        stay
-      } else if (organism.get.playerId != playerId) {
-        sender ! Status.Failure(InvalidOrganismException)
-        stay
-      } else {
-        worldAgent.send(_.drink(organism.get))
-        stay using stateData.addSender(sender)
+      stay using doAction(organismId, stateData) { (world, organism) =>
+        world.drink(organism)
       }
   }
 
@@ -119,4 +88,27 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
   }
 
   initialize
+
+  def doAction(organismId: UUID, stateData: StateData)(f: (World, Organism) => World): StateData = {
+    val world = worldAgent.get
+    val organism = world.getOrgansim(organismId)
+    if (organism.isEmpty) {
+      sender ! Status.Failure(UnknownOrganismException)
+      stateData
+    } else if (organism.get.playerId != playerId) {
+      sender ! Status.Failure(InvalidOrganismException)
+      stateData
+    } else {
+      worldAgent.send(f(_, organism.get))
+      stateData.addSender(sender)
+    }
+  }
+
+  def doSpawn(stateData: StateData): StateData = {
+    // TODO: spawn an organism.
+    val genome = Genome("Rat", Map("FeedAmount" -> 1, "FeedFrequency" -> 2, "ReproduceFrequency" -> 3))
+    val organism = Organism(playerId = playerId, genome = genome)
+    worldAgent.send(_.spawn(organism))
+    stateData.addSender(sender)
+  }
 }
