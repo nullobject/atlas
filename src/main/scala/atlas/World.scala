@@ -55,7 +55,7 @@ case class World(
   def spawn(organism: Organism): World = {
     if (organisms.contains(organism)) throw InvalidOperationException("Organism already spawned")
     val cell = Random.shuffle(cells).head
-    val newCell = cell.copy(organisms = organisms + organism)
+    val newCell = cell.copy(organisms = cell.organisms + organism)
     copy(cells = cells - cell + newCell)
   }
 
