@@ -7,8 +7,9 @@ import java.util.UUID
 import scala.concurrent.duration._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport
-import scala.language.postfixOps
 import spray.routing.{ExceptionHandler, HttpServiceActor}
+import spray.util.LoggingContext
+import scala.language.postfixOps
 
 /**
  * The server wraps player actions in an intention and forwards them to the
@@ -19,8 +20,8 @@ class Server(game: ActorRef) extends Actor with HttpServiceActor with SprayJsonS
 
   implicit val timeout = Timeout(5 seconds)
 
-  implicit val exceptionHandler = ExceptionHandler.fromPF {
-    case e: Player.InvalidActionException => log => ctx =>
+  implicit def exceptionHandler(implicit log: LoggingContext) = ExceptionHandler.fromPF {
+    case e: Player.InvalidActionException => ctx =>
       log.warning("Request {} could not be handled normally", ctx.request)
       ctx.complete(UnprocessableEntity, e.getMessage)
   }
