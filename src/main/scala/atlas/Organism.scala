@@ -30,8 +30,7 @@ case class Organism(
   def isAlive = health > 0
 
   // Returns true if this organism is similar to the given organism.
-  def isSimilar(that: Organism) =
-    (this.genome similarity that.genome) > 0.9
+  def isSimilar(that: Organism) = (this.genome similarity that.genome) > 0.9
 
   // Ticks the organism state.
   def tick = copy(age = age + 1)
