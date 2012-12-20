@@ -70,18 +70,18 @@ case class World(
 
   // Decrements the food in the cell containing the given organism.
   def eat(organism: Organism) = {
-    val from = getCellForOrganism(organism).get
-    if (from.food == 0) throw InvalidOperationException("No food in cell")
-    val newFrom = from.copy(food = from.food - 1)
-    copy(cells = cells - from + newFrom)
+    val cell = getCellForOrganism(organism).get
+    if (cell.food == 0) throw InvalidOperationException("No food in cell")
+    val newCell = cell.copy(food = cell.food - 1)
+    copy(cells = cells - cell + newCell)
   }
 
   // Decrements the water in the cell containing the given organism.
   def drink(organism: Organism) = {
-    val from = getCellForOrganism(organism).get
-    if (from.water == 0) throw InvalidOperationException("No water in cell")
-    val newFrom = from.copy(water = from.water - 1)
-    copy(cells = cells - from + newFrom)
+    val cell = getCellForOrganism(organism).get
+    if (cell.water == 0) throw InvalidOperationException("No water in cell")
+    val newCell = cell.copy(water = cell.water - 1)
+    copy(cells = cells - cell + newCell)
   }
 }
 
