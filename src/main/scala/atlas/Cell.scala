@@ -24,4 +24,8 @@ case class Cell(
   def decrementFood = copy(food = food - 1)
 
   def decrementWater = copy(water = water - 1)
+
+  def addOrganism(organism: Organism) = copy(organisms = organisms + organism)
+
+  def removeOrganism(organism: Organism) = copy(organisms = organisms - organism)
 }

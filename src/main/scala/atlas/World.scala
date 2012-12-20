@@ -42,6 +42,8 @@ case class World(
   def getCellsForPlayer(playerId: UUID) =
     cells.filter { _.organisms.find { _.playerId == playerId }.isDefined }
 
+  def replaceCell(a: Cell, b: Cell) = copy(cells = cells - a + b)
+
   // Ticks the world state.
   def tick = tickCells.incrementAge
 
@@ -54,7 +56,7 @@ case class World(
     if (organisms.contains(organism)) throw InvalidOperationException("Organism already spawned")
     val cell = Random.shuffle(cells).head
     val newCell = cell.copy(organisms = cell.organisms + organism)
-    copy(cells = cells - cell + newCell)
+    replaceCell(cell, newCell)
   }
 
   // Moves the given organism in the given direction.
@@ -67,9 +69,9 @@ case class World(
     if (toOption.isEmpty) throw InvalidOperationException("Invalid direction")
     val to = toOption.get
 
-    val newFrom = from.copy(organisms = from.organisms - organism)
-    val newTo = to.copy(organisms = to.organisms + organism)
-    copy(cells = cells - from + newFrom - to + newTo)
+    val newFrom = from.removeOrganism(organism)
+    val newTo = to.addOrganism(organism)
+    replaceCell(from, newFrom).replaceCell(to, newTo)
   }
 
   // Decrements the food in the cell containing the given organism.
@@ -77,7 +79,7 @@ case class World(
     val cell = getCellForOrganism(organism).get
     if (cell.food == 0) throw InvalidOperationException("No food in cell")
     val newCell = cell.decrementFood.copy(organisms = cell.organisms - organism + organism.eat)
-    copy(cells = cells - cell + newCell)
+    replaceCell(cell, newCell)
   }
 
   // Decrements the water in the cell containing the given organism.
@@ -85,7 +87,7 @@ case class World(
     val cell = getCellForOrganism(organism).get
     if (cell.water == 0) throw InvalidOperationException("No water in cell")
     val newCell = cell.decrementWater.copy(organisms = cell.organisms - organism + organism.drink)
-    copy(cells = cells - cell + newCell)
+    replaceCell(cell, newCell)
   }
 }
 
