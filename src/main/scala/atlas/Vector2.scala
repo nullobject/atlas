@@ -13,6 +13,8 @@ object Vector2 {
 
   // Automatic conversion from a Tuple2 to a Vector2.
   implicit def tuple2ToVector2(t: (Int, Int)) = new Vector2(t._1, t._2)
+
+  val directions = Set(Direction.N, Direction.NE, Direction.E, Direction.SE, Direction.S, Direction.SW, Direction.W, Direction.NW)
 }
 
 object Direction {
