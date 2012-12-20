@@ -3,10 +3,6 @@ package atlas
 import java.util.UUID
 import scala.util.Random
 
-object World {
-  case class InvalidOperationException(message: String) extends RuntimeException(message)
-}
-
 /*
  * The world class contains the world state.
  */
@@ -89,4 +85,8 @@ case class World(
     val newFrom = from.copy(water = from.water - 1)
     copy(cells = cells - from + newFrom)
   }
+}
+
+object World {
+  case class InvalidOperationException(message: String) extends RuntimeException(message)
 }

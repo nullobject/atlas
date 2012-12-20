@@ -5,44 +5,6 @@ import akka.agent.Agent
 import java.util.UUID
 import spray.json._
 
-object Player {
-  abstract class InvalidActionException(message: String) extends RuntimeException(message)
-
-  case object InvalidOrganismException extends InvalidActionException("Organsim does not belong to player")
-  case object UninitializedException   extends InvalidActionException("Player not initialized")
-  case object UnknownOrganismException extends InvalidActionException("Organsim does not exist")
-
-  sealed trait Action
-
-  object Action {
-    import JsonFormats._
-
-    // Do nothing.
-    case object Idle extends Action
-
-    // The given organism should consume a unit of food in the current cell.
-    case class Eat(organismId: UUID) extends Action
-
-    // The given organism should consume a unit of water in the current cell.
-    case class Drink(organismId: UUID) extends Action
-
-    // The given organism should move in the given direction.
-    case class Move(organismId: UUID, direction: Vector2) extends Action
-
-    def deserialize(value: String) = value.asJson.convertTo[Action]
-  }
-
-  case class Request(playerId: UUID, action: Action)
-
-  sealed trait StateName
-  case object Uninitialised extends StateName
-  case object Idle extends StateName
-
-  case class StateData(senders: List[ActorRef]) {
-    def addSender(sender: ActorRef) = copy(senders = senders :+ sender)
-  }
-}
-
 /**
  * The player FSM receives action events and executes them on the world agent.
  */
@@ -99,16 +61,53 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
       sender ! Status.Failure(InvalidOrganismException)
       stateData
     } else {
-      worldAgent.send(f(_, organism.get))
+      worldAgent.send(f(organism.get))
       stateData.addSender(sender)
     }
   }
 
   def doSpawn(stateData: StateData): StateData = {
-    // TODO: spawn an organism.
-    val genome = Genome("Rat", Map("FeedAmount" -> 1, "FeedFrequency" -> 2, "ReproduceFrequency" -> 3))
+    val genome = Genome("Rat", Map("EatFrequency" -> 100, "DrinkFrequency" -> 50))
     val organism = Organism(playerId = playerId, genome = genome)
     worldAgent.send(_.spawn(organism))
     stateData.addSender(sender)
+  }
+}
+
+object Player {
+  abstract class InvalidActionException(message: String) extends RuntimeException(message)
+
+  case object InvalidOrganismException extends InvalidActionException("Organsim does not belong to player")
+  case object UninitializedException   extends InvalidActionException("Player not initialized")
+  case object UnknownOrganismException extends InvalidActionException("Organsim does not exist")
+
+  sealed trait Action
+
+  object Action {
+    import JsonFormats._
+
+    // Do nothing.
+    case object Idle extends Action
+
+    // The given organism should consume a unit of food in the current cell.
+    case class Eat(organismId: UUID) extends Action
+
+    // The given organism should consume a unit of water in the current cell.
+    case class Drink(organismId: UUID) extends Action
+
+    // The given organism should move in the given direction.
+    case class Move(organismId: UUID, direction: Vector2) extends Action
+
+    def deserialize(value: String) = value.asJson.convertTo[Action]
+  }
+
+  case class Request(playerId: UUID, action: Action)
+
+  sealed trait StateName
+  case object Uninitialised extends StateName
+  case object Idle extends StateName
+
+  case class StateData(senders: List[ActorRef]) {
+    def addSender(sender: ActorRef) = copy(senders = senders :+ sender)
   }
 }
