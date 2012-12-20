@@ -26,6 +26,9 @@ case class Organism(
 
   lastDrink: Int = 0
 ) {
+  // Returns true if the organism is alive.
+  def isAlive = health > 0
+
   // Returns true if this organism is similar to the given organism.
   def isSimilar(that: Organism) =
     (this.genome similarity that.genome) > 0.9
