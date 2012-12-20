@@ -33,9 +33,13 @@ case class Organism(
   def isSimilar(that: Organism) = (this.genome similarity that.genome) > 0.9
 
   // Ticks the organism state.
-  def tick = copy(age = age + 1)
+  def tick = incrementAge
 
-  def eat = copy(health = health + 1, lastEat = age)
+  def eat = incrementHealth.copy(lastEat = age)
 
-  def drink = copy(health = health + 1, lastDrink = age)
+  def drink = incrementHealth.copy(lastDrink = age)
+
+  def incrementAge = copy(age = age + 1)
+
+  def incrementHealth = copy(health = health + 1)
 }

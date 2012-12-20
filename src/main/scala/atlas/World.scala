@@ -43,7 +43,11 @@ case class World(
     cells.filter { _.organisms.find { _.playerId == playerId }.isDefined }
 
   // Ticks the world state.
-  def tick = copy(cells = cells.map(_.tick), age = age + 1)
+  def tick = tickCells.incrementAge
+
+  def tickCells = copy(cells = cells.map(_.tick))
+
+  def incrementAge = copy(age = age + 1)
 
   // Spawns the given organism into the world.
   def spawn(organism: Organism) = {
@@ -72,7 +76,7 @@ case class World(
   def eat(organism: Organism) = {
     val cell = getCellForOrganism(organism).get
     if (cell.food == 0) throw InvalidOperationException("No food in cell")
-    val newCell = cell.copy(organisms = cell.organisms - organism + organism.eat, food = cell.food - 1)
+    val newCell = cell.decrementFood.copy(organisms = cell.organisms - organism + organism.eat)
     copy(cells = cells - cell + newCell)
   }
 
@@ -80,7 +84,7 @@ case class World(
   def drink(organism: Organism) = {
     val cell = getCellForOrganism(organism).get
     if (cell.water == 0) throw InvalidOperationException("No water in cell")
-    val newCell = cell.copy(organisms = cell.organisms - organism + organism.drink, water = cell.water - 1)
+    val newCell = cell.decrementWater.copy(organisms = cell.organisms - organism + organism.drink)
     copy(cells = cells - cell + newCell)
   }
 }

@@ -15,7 +15,7 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
 
   when(Uninitialised) {
     case Event(Action.Idle, stateData) =>
-      goto(Idle) using doSpawn(stateData)
+      goto(Idle) using spawn(stateData)
 
     case Event(_: Action, _) =>
       sender ! Status.Failure(UninitializedException)
@@ -27,13 +27,13 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
       stay using stateData.addSender(sender)
 
     case Event(Action.Move(organismId, direction), stateData) =>
-      stay using doAction(organismId, stateData) { (organism) => _.move(organism, direction) }
+      stay using action(organismId, stateData) { (organism) => _.move(organism, direction) }
 
     case Event(Action.Eat(organismId), stateData) =>
-      stay using doAction(organismId, stateData) { (organism) => _.eat(organism) }
+      stay using action(organismId, stateData) { (organism) => _.eat(organism) }
 
     case Event(Action.Drink(organismId), stateData) =>
-      stay using doAction(organismId, stateData) { (organism) => _.drink(organism) }
+      stay using action(organismId, stateData) { (organism) => _.drink(organism) }
   }
 
   whenUnhandled {
@@ -46,7 +46,7 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
 
   initialize
 
-  def doAction(organismId: UUID, stateData: StateData)(f: Organism => World => World): StateData = {
+  def action(organismId: UUID, stateData: StateData)(f: Organism => World => World): StateData = {
     val world = worldAgent.get
     val organism = world.getOrgansim(organismId)
     if (organism.isEmpty) {
@@ -61,7 +61,7 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
     }
   }
 
-  def doSpawn(stateData: StateData): StateData = {
+  def spawn(stateData: StateData): StateData = {
     val genome = Genome("Rat", Map("EatFrequency" -> 100, "DrinkFrequency" -> 50))
     val organism = Organism(playerId = playerId, genome = genome)
     worldAgent.send(_.spawn(organism))

@@ -17,5 +17,11 @@ case class Cell(
   organisms: Set[Organism] = Set.empty
 ) {
   // Ticks the cell state.
-  def tick = copy(organisms = organisms.map(_.tick).filter(_.isAlive))
+  def tick = tickOrganisms
+
+  def tickOrganisms = copy(organisms = organisms.map(_.tick).filter(_.isAlive))
+
+  def decrementFood = copy(food = food - 1)
+
+  def decrementWater = copy(water = water - 1)
 }
