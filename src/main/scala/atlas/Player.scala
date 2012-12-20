@@ -27,13 +27,13 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
       stay using stateData.addSender(sender)
 
     case Event(Action.Move(organismId, direction), stateData) =>
-      stay using action(organismId, stateData) { (organism) => _.move(organism, direction) }
+      stay using action(organismId, stateData) { World.move(direction) }
 
     case Event(Action.Eat(organismId), stateData) =>
-      stay using action(organismId, stateData) { (organism) => _.eat(organism) }
+      stay using action(organismId, stateData) { World.eat }
 
     case Event(Action.Drink(organismId), stateData) =>
-      stay using action(organismId, stateData) { (organism) => _.drink(organism) }
+      stay using action(organismId, stateData) { World.drink }
   }
 
   whenUnhandled {
@@ -48,7 +48,7 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
 
   def action(organismId: UUID, stateData: StateData)(f: Organism => World => World): StateData = {
     val world = worldAgent.get
-    val organism = world.getOrgansim(organismId)
+    val organism = Cell.findOrgansim(organismId)(world.cells)
     if (organism.isEmpty) {
       sender ! Status.Failure(UnknownOrganismException)
       stateData
@@ -64,7 +64,7 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
   def spawn(stateData: StateData): StateData = {
     val genome = Genome("Rat", Map("EatFrequency" -> 100, "DrinkFrequency" -> 50))
     val organism = Organism(playerId = playerId, genome = genome)
-    worldAgent.send(_.spawn(organism))
+    worldAgent.send(World.spawn(organism))
     stateData.addSender(sender)
   }
 }

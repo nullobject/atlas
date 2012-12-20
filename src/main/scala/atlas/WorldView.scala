@@ -22,8 +22,8 @@ case class WorldView(
 
 object WorldView {
   def scopeToPlayer(playerId: UUID, world: World) = {
-    val playerCells = world.getCellsForPlayer(playerId)
-    val surroundingCells = playerCells.flatMap { world.getSurroundingCells }
+    val playerCells = Cell.findCellsForPlayer(playerId)(world.cells)
+    val surroundingCells = playerCells.flatMap { cell => Cell.findSurroundingCells(cell)(world.cells) }
     val cells = playerCells | surroundingCells
     WorldView(cells = cells, age = world.age)
   }

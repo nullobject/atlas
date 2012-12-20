@@ -38,7 +38,7 @@ class Game(worldAgent: Agent[World]) extends Actor with FSM[Game.StateName, Game
   when(Idle) {
     case Event(Tick, _) =>
       children.foreach { _ ! Tick }
-      worldAgent.send(_.tick)
+      worldAgent.send(World.tick)
       stay
 
     case Event(Player.Request(playerId, action), _) =>
