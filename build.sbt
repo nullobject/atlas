@@ -19,3 +19,5 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.0.M5-B1" % "test" cross CrossVersion.full,
   "org.scalaz" %% "scalaz-core" % "7.0.0-M6" cross CrossVersion.full
 )
+
+initialCommands in console := "import scalaz._, Scalaz._"
