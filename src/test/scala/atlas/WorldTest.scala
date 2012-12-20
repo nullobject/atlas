@@ -114,13 +114,13 @@ class WorldTest extends FunSpec {
 
   describe("#eat") {
     it("should decrement the food in the cell containing the given organism") {
-      assert(world.getCellForOrganism(organism1).get.food === 100)
+      assert(world.getCellAtPosition(0, 0).get.food === 100)
       val result = world.eat(organism1)
-      assert(result.getCellForOrganism(organism1).get.food === 99)
+      assert(result.getCellAtPosition(0, 0).get.food === 99)
     }
 
     it("should fail when eating in a cell with no food") {
-      assert(world.getCellForOrganism(organism2).get.food === 0)
+      assert(world.getCellAtPosition(1, 0).get.food === 0)
       intercept[World.InvalidOperationException] {
         world.eat(organism2)
       }
@@ -129,13 +129,13 @@ class WorldTest extends FunSpec {
 
   describe("#drink") {
     it("should decrement the water in the cell containing the given organism") {
-      assert(world.getCellForOrganism(organism1).get.water === 100)
+      assert(world.getCellAtPosition(0, 0).get.water === 100)
       val result = world.drink(organism1)
-      assert(result.getCellForOrganism(organism1).get.water === 99)
+      assert(result.getCellAtPosition(0, 0).get.water === 99)
     }
 
     it("should fail when drinking in a cell with no water") {
-      assert(world.getCellForOrganism(organism2).get.water === 0)
+      assert(world.getCellAtPosition(1, 0).get.water === 0)
       intercept[World.InvalidOperationException] {
         world.drink(organism2)
       }

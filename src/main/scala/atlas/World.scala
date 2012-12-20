@@ -72,7 +72,7 @@ case class World(
   def eat(organism: Organism) = {
     val cell = getCellForOrganism(organism).get
     if (cell.food == 0) throw InvalidOperationException("No food in cell")
-    val newCell = cell.copy(food = cell.food - 1)
+    val newCell = cell.copy(organisms = cell.organisms - organism + organism.eat, food = cell.food - 1)
     copy(cells = cells - cell + newCell)
   }
 
@@ -80,7 +80,7 @@ case class World(
   def drink(organism: Organism) = {
     val cell = getCellForOrganism(organism).get
     if (cell.water == 0) throw InvalidOperationException("No water in cell")
-    val newCell = cell.copy(water = cell.water - 1)
+    val newCell = cell.copy(organisms = cell.organisms - organism + organism.drink, water = cell.water - 1)
     copy(cells = cells - cell + newCell)
   }
 }
