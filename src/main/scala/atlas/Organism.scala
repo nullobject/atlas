@@ -33,7 +33,13 @@ case class Organism(
   def isSimilar(that: Organism) = (this.genome similarity that.genome) > 0.9
 
   // Ticks the organism state.
-  def tick = incrementAge
+  def tick = {
+    val newOrganism = incrementAge
+    if (age - lastEat >= genome("EatFrequency") || age - lastDrink >= genome("DrinkFrequency"))
+      newOrganism.decrementHealth
+    else
+      newOrganism
+  }
 
   def eat = incrementHealth.copy(lastEat = age)
 
@@ -42,4 +48,6 @@ case class Organism(
   def incrementAge = copy(age = age + 1)
 
   def incrementHealth = copy(health = health + 1)
+
+  def decrementHealth = copy(health = health - 1)
 }
