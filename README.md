@@ -28,10 +28,6 @@ rate at which a organism must eat or drink is dependent on a organism's genes.
 
 ### Attacking
 
-### Mating
-
-An organsim can only mate with another organism if they are genetically compatible.
-
 ### Genes
 
 * PreferredTemperature: the preferred temperature for a organism.
@@ -112,14 +108,6 @@ Attack:
 
     {
       "action": "attack",
-      "organismId": "123",
-      "targetId": "456"
-    }
-
-Mate:
-
-    {
-      "action": "mate",
       "organismId": "123",
       "targetId": "456"
     }
