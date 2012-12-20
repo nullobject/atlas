@@ -28,4 +28,6 @@ case class Cell(
   def addOrganism(organism: Organism) = copy(organisms = organisms + organism)
 
   def removeOrganism(organism: Organism) = copy(organisms = organisms - organism)
+
+  def replaceOrganism(a: Organism, b: Organism) = copy(organisms = organisms - a + b)
 }

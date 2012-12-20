@@ -55,7 +55,7 @@ case class World(
   def spawn(organism: Organism) = {
     if (organisms.contains(organism)) throw InvalidOperationException("Organism already spawned")
     val cell = Random.shuffle(cells).head
-    val newCell = cell.copy(organisms = cell.organisms + organism)
+    val newCell = cell.addOrganism(organism)
     replaceCell(cell, newCell)
   }
 
@@ -78,7 +78,7 @@ case class World(
   def eat(organism: Organism) = {
     val cell = getCellForOrganism(organism).get
     if (cell.food == 0) throw InvalidOperationException("No food in cell")
-    val newCell = cell.decrementFood.copy(organisms = cell.organisms - organism + organism.eat)
+    val newCell = cell.decrementFood.replaceOrganism(organism, organism.eat)
     replaceCell(cell, newCell)
   }
 
@@ -86,7 +86,7 @@ case class World(
   def drink(organism: Organism) = {
     val cell = getCellForOrganism(organism).get
     if (cell.water == 0) throw InvalidOperationException("No water in cell")
-    val newCell = cell.decrementWater.copy(organisms = cell.organisms - organism + organism.drink)
+    val newCell = cell.decrementWater.replaceOrganism(organism, organism.drink)
     replaceCell(cell, newCell)
   }
 }
