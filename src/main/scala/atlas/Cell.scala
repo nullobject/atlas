@@ -1,5 +1,8 @@
 package atlas
 
+/**
+ * The cell class represents the state of a cell.
+ */
 case class Cell(
   // The cell position.
   position: Vector2,

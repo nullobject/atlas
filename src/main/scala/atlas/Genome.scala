@@ -4,8 +4,12 @@ import spray.json._
 import FractionalImplicits._
 import JsonFormats._
 
-// A genome is a set of genes.
+/**
+ * A genome is a set of genes.
+ */
 case class Genome(name: String, genes: Map[String, Double]) {
+  def apply(name: String) = genes(name)
+
   def serialize = this.toJson.compactPrint
 
   // Crosses this genome with the given genome to produce a new genome.

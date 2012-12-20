@@ -4,7 +4,7 @@ import java.util.UUID
 import scala.util.Random
 
 /*
- * The world class contains the world state.
+ * The world class represents the state of the world.
  */
 case class World(
   // The cells in the world.

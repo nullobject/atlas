@@ -2,6 +2,10 @@ package atlas
 
 import java.util.UUID
 
+/**
+ * The organism class represents a living organism. Organisms occupy cells in
+ * the world.
+ */
 case class Organism(
   // The organism ID.
   id: UUID = UUID.randomUUID(),
