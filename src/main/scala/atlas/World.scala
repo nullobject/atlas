@@ -43,10 +43,10 @@ case class World(
     cells.filter { _.organisms.find { _.playerId == playerId }.isDefined }
 
   // Ticks the world state.
-  def tick: World = copy(age = age + 1)
+  def tick = copy(cells = cells.map(_.tick), age = age + 1)
 
   // Spawns the given organism into the world.
-  def spawn(organism: Organism): World = {
+  def spawn(organism: Organism) = {
     if (organisms.contains(organism)) throw InvalidOperationException("Organism already spawned")
     val cell = Random.shuffle(cells).head
     val newCell = cell.copy(organisms = cell.organisms + organism)
@@ -54,7 +54,7 @@ case class World(
   }
 
   // Moves the given organism in the given direction.
-  def move(organism: Organism, direction: Vector2): World = {
+  def move(organism: Organism, direction: Vector2) = {
     val fromOption = getCellForOrganism(organism)
     if (fromOption.isEmpty) throw InvalidOperationException("Unknown organism")
     val from = fromOption.get
@@ -69,7 +69,7 @@ case class World(
   }
 
   // Decrements the food in the cell containing the given organism.
-  def eat(organism: Organism): World = {
+  def eat(organism: Organism) = {
     val from = getCellForOrganism(organism).get
     if (from.food == 0) throw InvalidOperationException("No food in cell")
     val newFrom = from.copy(food = from.food - 1)
@@ -77,7 +77,7 @@ case class World(
   }
 
   // Decrements the water in the cell containing the given organism.
-  def drink(organism: Organism): World = {
+  def drink(organism: Organism) = {
     val from = getCellForOrganism(organism).get
     if (from.water == 0) throw InvalidOperationException("No water in cell")
     val newFrom = from.copy(water = from.water - 1)
