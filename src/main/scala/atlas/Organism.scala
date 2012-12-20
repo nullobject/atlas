@@ -34,4 +34,8 @@ case class Organism(
 
   // Ticks the organism state.
   def tick = copy(age = age + 1)
+
+  def eat = copy(health = health + 1, lastEat = age)
+
+  def drink = copy(health = health + 1, lastDrink = age)
 }
