@@ -17,7 +17,14 @@ case class Organism(
   genome: Genome = Genome.empty,
 
   // The organism health.
-  health: Int = 100
+  health: Int = 100,
+
+  // The age of the organism.
+  age: Int = 0,
+
+  lastEat: Int = 0,
+
+  lastDrink: Int = 0
 ) {
   // Returns true if this organism is similar to the given organism.
   def isSimilar(that: Organism) =

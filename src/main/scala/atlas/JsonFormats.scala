@@ -59,7 +59,7 @@ object JsonFormats extends DefaultJsonProtocol {
 
   implicit val playerRequestFormat = jsonFormat2(Player.Request.apply)
   implicit val genomeFormat        = jsonFormat2(Genome.apply)
-  implicit val organismFormat      = jsonFormat4(Organism.apply)
+  implicit val organismFormat      = jsonFormat7(Organism.apply)
   implicit val cellFormat          = jsonFormat4(Cell.apply)
   implicit val worldViewFormat     = jsonFormat2(WorldView.apply)
 }
