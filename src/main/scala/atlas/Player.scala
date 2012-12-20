@@ -27,31 +27,26 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
       stay using stateData.addSender(sender)
 
     case Event(Action.Move(organismId, direction), stateData) =>
-      stay using doAction(organismId, stateData) { (world, organism) =>
-        world.move(organism, direction)
-      }
+      stay using doAction(organismId, stateData) { (organism) => _.move(organism, direction) }
 
     case Event(Action.Eat(organismId), stateData) =>
-      stay using doAction(organismId, stateData) { (world, organism) =>
-        world.eat(organism)
-      }
+      stay using doAction(organismId, stateData) { (organism) => _.eat(organism) }
 
     case Event(Action.Drink(organismId), stateData) =>
-      stay using doAction(organismId, stateData) { (world, organism) =>
-        world.drink(organism)
-      }
+      stay using doAction(organismId, stateData) { (organism) => _.drink(organism) }
   }
 
   whenUnhandled {
     case Event(Game.Tick, stateData) =>
       val world = worldAgent.get
-      stateData.senders.map { _ ! WorldView.scopeToPlayer(playerId, world) }
+      val worldView = WorldView.scopeToPlayer(playerId, world)
+      stateData.senders.map { _ ! worldView }
       stay using stateData.copy(senders = List.empty)
   }
 
   initialize
 
-  def doAction(organismId: UUID, stateData: StateData)(f: (World, Organism) => World): StateData = {
+  def doAction(organismId: UUID, stateData: StateData)(f: Organism => World => World): StateData = {
     val world = worldAgent.get
     val organism = world.getOrgansim(organismId)
     if (organism.isEmpty) {
