@@ -35,9 +35,8 @@ case class World(
     getCellAtPosition(cell.position + direction)
 
   /* // Returns the cells surrounding the given cell. */
-  def getSurroundingCells(cell: Cell) = {
+  def getSurroundingCells(cell: Cell) =
     Vector2.directions.flatMap { getAdjacentCell(cell, _) }
-  }
 
   // Returns the cells which contain organisims for the given player.
   def getCellsForPlayer(playerId: UUID) =
