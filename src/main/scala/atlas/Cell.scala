@@ -15,4 +15,7 @@ case class Cell(
 
   // The set of organisms occupying this cell.
   organisms: Set[Organism] = Set.empty
-)
+) {
+  // Ticks the cell state.
+  def tick = copy(organisms = organisms.map(_.tick).filter(_.isAlive))
+}
