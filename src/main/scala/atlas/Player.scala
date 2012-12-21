@@ -3,6 +3,7 @@ package atlas
 import akka.actor.{Actor, ActorRef, FSM, Status}
 import akka.agent.Agent
 import java.util.UUID
+import scala.concurrent.stm._
 import spray.json._
 
 /**
@@ -56,7 +57,9 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
       sender ! Status.Failure(InvalidOrganismException)
       stateData
     } else {
-      worldAgent.send(f(organism.get))
+      atomic { txn =>
+        worldAgent.send(f(organism.get))
+      }
       stateData.addSender(sender)
     }
   }
