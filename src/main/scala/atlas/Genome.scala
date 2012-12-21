@@ -1,5 +1,6 @@
 package atlas
 
+import scala.util.Random
 import spray.json._
 import FractionalImplicits._
 import JsonFormats._
@@ -29,6 +30,11 @@ case class Genome(name: String, genes: Map[String, Double]) {
     val xs = this.genes.filterKeys(keys).values
     val ys = that.genes.filterKeys(keys).values
     Math.correlation(xs.toList, ys.toList)
+  }
+
+  def mutate = {
+    val newGenes = genes.map { case (name, value) => (name, value + (((Random.nextDouble * 2.0) - 1.0) * value * 0.05)) }
+    copy(genes = newGenes)
   }
 }
 
