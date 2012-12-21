@@ -52,4 +52,10 @@ case class Organism(
   def incrementHealth = copy(health = health + 1)
 
   def decrementHealth = copy(health = health - 1)
+  def reproduce = {
+    if (age - lastReproduce >= genome("ReproduceFrequency"))
+      Set(copy(lastReproduce = age), Organism(playerId = playerId, genome = genome.mutate))
+    else
+      Set(this)
+  }
 }

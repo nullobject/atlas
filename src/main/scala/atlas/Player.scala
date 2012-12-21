@@ -62,7 +62,7 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
   }
 
   def spawn(stateData: StateData): StateData = {
-    val genome = Genome("Rat", Map("EatFrequency" -> 100, "DrinkFrequency" -> 50))
+    val genome = Genome("Rat", Map("ReproduceFrequency" -> 50, "EatFrequency" -> 100, "DrinkFrequency" -> 50))
     val organism = Organism(playerId = playerId, genome = genome)
     worldAgent.send(_.spawn(organism))
     stateData.addSender(sender)
