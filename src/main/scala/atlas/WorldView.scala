@@ -15,7 +15,7 @@ case class WorldView(
   cells: Set[Cell],
 
   // The age of the world.
-  age: Int = 0
+  age: Long = 0
 ) {
   def serialize = this.toJson.compactPrint
 }

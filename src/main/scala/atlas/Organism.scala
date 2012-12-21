@@ -17,14 +17,16 @@ case class Organism(
   genome: Genome = Genome.empty,
 
   // The organism health.
-  health: Int = 100,
+  health: Long = 100,
 
   // The age of the organism.
-  age: Int = 0,
+  age: Long = 0,
 
-  lastEat: Int = 0,
+  lastEat: Long = 0,
 
-  lastDrink: Int = 0
+  lastDrink: Long = 0,
+
+  lastReproduce: Long = 0
 ) {
   // Returns true if the organism is alive.
   def isAlive = health > 0

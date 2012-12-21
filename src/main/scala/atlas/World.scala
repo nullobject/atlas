@@ -11,7 +11,7 @@ case class World(
   cells: Set[Cell],
 
   // The age of the world.
-  age: Int = 0
+  age: Long = 0
 ) {
   import World._
 
