@@ -6,16 +6,6 @@ import java.util.UUID
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-object Game {
-  sealed trait StateName
-  case object Idle extends StateName
-
-  case class StateData(worldAgent: Agent[World])
-
-  sealed trait Message
-  case object Tick extends Message
-}
-
 /**
  * The game FSM receives players' intentions from the server and routes them
  * to a player actor. On every tick event the game forwards the players a tick
@@ -53,4 +43,14 @@ class Game(worldAgent: Agent[World]) extends Actor with FSM[Game.StateName, Game
 
   def newPlayer(playerId: UUID) =
     actorOf(Props(new Player(playerId, worldAgent)), name = s"player-$playerId")
+}
+
+object Game {
+  sealed trait StateName
+  case object Idle extends StateName
+
+  case class StateData(worldAgent: Agent[World])
+
+  sealed trait Message
+  case object Tick extends Message
 }
