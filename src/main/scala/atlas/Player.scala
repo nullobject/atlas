@@ -15,26 +15,35 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
   startWith(Uninitialised, StateData(List.empty))
 
   when(Uninitialised) {
-    case Event(Action.Idle, stateData) =>
+    case Event(List(Action.Idle), stateData) =>
       goto(Idle) using spawn(stateData)
 
-    case Event(_: Action, _) =>
+    case Event(_, _) =>
       sender ! Status.Failure(UninitializedException)
       stay
   }
 
   when(Idle) {
-    case Event(Action.Idle, stateData) =>
+    case Event(actions: List[Action], stateData) =>
+      atomic { txn =>
+        val world = worldAgent.get
+        actions.map { action =>
+          action match {
+            case Action.Idle =>
+              // Do nothing.
+            case Action.Move(organismId, direction) =>
+              val organism = world.getOrgansim(organismId)
+              organism map { o => worldAgent.send(_.move(o, direction)) }
+            case Action.Eat(organismId) =>
+              val organism = world.getOrgansim(organismId)
+              organism map { o => worldAgent.send(_.eat(o)) }
+            case Action.Drink(organismId) =>
+              val organism = world.getOrgansim(organismId)
+              organism map { o => worldAgent.send(_.drink(o)) }
+          }
+        }
+      }
       stay using stateData.addSender(sender)
-
-    case Event(Action.Move(organismId, direction), stateData) =>
-      stay using action(organismId, stateData) { (organism) => _.move(organism, direction) }
-
-    case Event(Action.Eat(organismId), stateData) =>
-      stay using action(organismId, stateData) { (organism) => _.eat(organism) }
-
-    case Event(Action.Drink(organismId), stateData) =>
-      stay using action(organismId, stateData) { (organism) => _.drink(organism) }
   }
 
   whenUnhandled {
@@ -47,25 +56,8 @@ class Player(playerId: UUID, worldAgent: Agent[World]) extends Actor with FSM[Pl
 
   initialize
 
-  def action(organismId: UUID, stateData: StateData)(f: Organism => World => World): StateData = {
-    val world = worldAgent.get
-    val organism = world.getOrgansim(organismId)
-    if (organism.isEmpty) {
-      sender ! Status.Failure(UnknownOrganismException)
-      stateData
-    } else if (organism.get.playerId != playerId) {
-      sender ! Status.Failure(InvalidOrganismException)
-      stateData
-    } else {
-      atomic { txn =>
-        worldAgent.send(f(organism.get))
-      }
-      stateData.addSender(sender)
-    }
-  }
-
   def spawn(stateData: StateData): StateData = {
-    val genome = Genome("Rat", Map("ReproduceFrequency" -> 50, "EatFrequency" -> 100, "DrinkFrequency" -> 50))
+    val genome = Genome("Rat", Map("ReproduceFrequency" -> 200, "EatFrequency" -> 100, "DrinkFrequency" -> 50))
     val organism = Organism(playerId = playerId, genome = genome)
     worldAgent.send(_.spawn(organism))
     stateData.addSender(sender)
@@ -99,7 +91,7 @@ object Player {
     def deserialize(value: String) = value.asJson.convertTo[Action]
   }
 
-  case class Request(playerId: UUID, action: Action)
+  case class Request(playerId: UUID, actions: List[Action])
 
   sealed trait StateName
   case object Uninitialised extends StateName

@@ -30,9 +30,9 @@ class Server(game: ActorRef) extends Actor with HttpServiceActor with SprayJsonS
     headerValueByName("X-Player") { player =>
       path("intentions") {
         post {
-          entity(as[Player.Action]) { action =>
+          entity(as[List[Player.Action]]) { actions =>
             val playerId = UUID.fromString(player)
-            val playerRequest = Player.Request(playerId, action)
+            val playerRequest = Player.Request(playerId, actions)
             val response = ask(game, playerRequest).mapTo[WorldView]
             complete(response)
           }

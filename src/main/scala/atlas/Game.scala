@@ -31,8 +31,8 @@ class Game(worldAgent: Agent[World]) extends Actor with FSM[Game.StateName, Game
       worldAgent.send(_.tick)
       stay
 
-    case Event(Player.Request(playerId, action), _) =>
-      getPlayer(playerId).forward(action)
+    case Event(Player.Request(playerId, actions), _) =>
+      getPlayer(playerId).forward(actions)
       stay
   }
 

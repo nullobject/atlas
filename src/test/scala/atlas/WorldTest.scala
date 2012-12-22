@@ -3,7 +3,7 @@ package atlas
 import org.scalatest.FunSpec
 
 class WorldTest extends FunSpec {
-  val genome = Genome(name = "rat", genes = Map("EatFrequency" -> 1, "DrinkFrequency" -> 2))
+  val genome = Genome(name = "rat", genes = Map("EatFrequency" -> 1, "DrinkFrequency" -> 2, "ReproduceFrequency" -> 3))
 
   val organism1 = Organism(genome = genome)
   val organism2 = Organism(genome = genome)
